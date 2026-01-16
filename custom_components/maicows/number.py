@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 from homeassistant.components.number import NumberEntity, NumberMode
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTemperature
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
 from . import MaicoCoordinator
+from .const import DOMAIN
+
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,16 +27,18 @@ async def async_setup_entry(
 ) -> None:
     """Set up the Maico WS320B number platform."""
     coordinator: MaicoCoordinator = hass.data[DOMAIN][config_entry.entry_id]
-    
+
     entities = [
         MaicoWS320BSupplyTempMinCoolNumber(coordinator),
         MaicoWS320BMaxRoomTempNumber(coordinator),
     ]
-    
+
     async_add_entities(entities, update_before_add=True)
 
 
-class MaicoWS320BSupplyTempMinCoolNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity):
+class MaicoWS320BSupplyTempMinCoolNumber(
+    CoordinatorEntity[MaicoCoordinator], NumberEntity
+):
     """Representation of a Maico WS320B minimum supply air temperature for cooling setting."""
 
     _attr_has_entity_name = True
@@ -43,7 +48,7 @@ class MaicoWS320BSupplyTempMinCoolNumber(CoordinatorEntity[MaicoCoordinator], Nu
         """Initialize the number."""
         super().__init__(coordinator)
         self._api = coordinator.api
-        self._attr_unique_id = f"{self._api._host}_{self._api._port}_supply_temp_min_cool"
+        self._attr_unique_id = f"{self._api.host}_{self._api.port}_supply_temp_min_cool"
         self._attr_device_info = coordinator.device_info
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_native_min_value = 8.0  # From documentation: 8°C
@@ -76,7 +81,7 @@ class MaicoWS320BMaxRoomTempNumber(CoordinatorEntity[MaicoCoordinator], NumberEn
         """Initialize the number."""
         super().__init__(coordinator)
         self._api = coordinator.api
-        self._attr_unique_id = f"{self._api._host}_{self._api._port}_room_temp_max"
+        self._attr_unique_id = f"{self._api.host}_{self._api.port}_room_temp_max"
         self._attr_device_info = coordinator.device_info
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_native_min_value = 18.0  # From documentation: 18°C

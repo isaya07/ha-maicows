@@ -3,18 +3,19 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.fan import FanEntity, FanEntityFeature
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, FAN_LEVELS
-from .maico_ws_api import MaicoWS
 from . import MaicoCoordinator
+from .const import DOMAIN
+
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         """Initialize the fan entity."""
         super().__init__(coordinator)
         self._api = coordinator.api
-        self._attr_unique_id = f"{self._api._host}_{self._api._port}_fan"
+        self._attr_unique_id = f"{self._api.host}_{self._api.port}_fan"
         self._attr_device_info = coordinator.device_info
         self._attr_supported_features = (
             FanEntityFeature.SET_SPEED
@@ -72,7 +73,13 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         self._attr_icon = "mdi:fan"
 
         # Define preset modes based on official documentation
-        self._attr_preset_modes = ["off", "humidity_protection", "reduced", "normal", "intensive"]
+        self._attr_preset_modes = [
+            "off",
+            "humidity_protection",
+            "reduced",
+            "normal",
+            "intensive",
+        ]
 
     @property
     def is_on(self) -> bool | None:
@@ -81,13 +88,10 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         power_state = self.coordinator.data.get("power_state")
         if power_state is not None and not power_state:
             return False
-            
+
         # Also check ventilation level
         ventilation_level = self.coordinator.data.get("current_ventilation_level")
-        if ventilation_level == 0:
-            return False
-            
-        return True
+        return ventilation_level != 0
 
     @property
     def percentage(self) -> int | None:
@@ -95,16 +99,16 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         ventilation_level = self.coordinator.data.get("current_ventilation_level")
         if ventilation_level is None:
             return None
-            
+
         if ventilation_level == 0:
             return 0
-        elif ventilation_level == 1:
+        if ventilation_level == 1:
             return 25
-        elif ventilation_level == 2:
+        if ventilation_level == 2:
             return 50
-        elif ventilation_level == 3:
+        if ventilation_level == 3:
             return 75
-        elif ventilation_level == 4:
+        if ventilation_level == 4:
             return 100
         return 50
 
@@ -114,23 +118,24 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         ventilation_level = self.coordinator.data.get("current_ventilation_level")
         if ventilation_level is None:
             return None
-            
+
         if ventilation_level == 0:
             return "off"
-        elif ventilation_level == 1:
+        if ventilation_level == 1:
             return "humidity_protection"
-        elif ventilation_level == 2:
+        if ventilation_level == 2:
             return "reduced"
-        elif ventilation_level == 3:
+        if ventilation_level == 3:
             return "normal"
-        elif ventilation_level == 4:
+        if ventilation_level == 4:
             return "intensive"
         return "normal"
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set the preset mode (fan level) based on official documentation."""
         if preset_mode not in self._attr_preset_modes:
-            raise HomeAssistantError(f"Unsupported preset mode: {preset_mode}")
+            msg = f"Unsupported preset mode: {preset_mode}"
+            raise HomeAssistantError(msg)
 
         # Map preset mode to ventilation level based on official documentation
         level = 0
@@ -150,7 +155,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
 
         # Ensure the device is turned on when setting a level
         if level != 0 and not self.is_on:  # Only turn on if not setting to "off"
-            power_success = await self._api.write_power_state(True)
+            power_success = await self._api.write_power_state(state=True)
             if not power_success:
                 _LOGGER.error("Failed to turn on device before setting fan level")
                 return
@@ -175,13 +180,13 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         else:
             # Turn on the device if it's off
             if not self.is_on:
-                power_success = await self._api.write_power_state(True)
+                power_success = await self._api.write_power_state(state=True)
                 if not power_success:
                     _LOGGER.error("Failed to turn on device before setting speed")
                     return
 
             # Map percentage to ventilation level based on official documentation
-            level = 3 # Default normal
+            level = 3  # Default normal
             if percentage <= 20:
                 level = 1  # Humidity protection
             elif percentage <= 40:
@@ -207,7 +212,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
     ) -> None:
         """Turn on the fan."""
         # Turn on the device
-        power_success = await self._api.write_power_state(True)
+        power_success = await self._api.write_power_state(state=True)
         if not power_success:
             _LOGGER.error("Failed to turn on the device")
             return
@@ -221,15 +226,15 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
             # Default to reduced level (2) if no specific level requested and currently off
             current_level = self.coordinator.data.get("current_ventilation_level", 0)
             if current_level == 0:
-                 level_success = await self._api.write_ventilation_level(2)
-                 if level_success:
-                     await self.coordinator.async_request_refresh()
+                level_success = await self._api.write_ventilation_level(2)
+                if level_success:
+                    await self.coordinator.async_request_refresh()
             else:
-                 await self.coordinator.async_request_refresh()
+                await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off the fan."""
-        success = await self._api.write_power_state(False)
+        success = await self._api.write_power_state(state=False)
         if success:
             await self.coordinator.async_request_refresh()
         else:

@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFlow
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
 from homeassistant.core import HomeAssistant, callback
@@ -78,10 +77,11 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         if connected:
             await maico_api.disconnect()
             return {"title": data[CONF_NAME]}
-        else:
-            raise Exception("Could not connect to Maico WS")
+        msg = "Could not connect to Maico WS"
+        raise Exception(msg)
     except Exception as e:
-        raise Exception(f"Connection failed: {e}")
+        msg = f"Connection failed: {e}"
+        raise Exception(msg)
 
 
 class MaicoWSConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -89,7 +89,7 @@ class MaicoWSConfigFlow(ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the config flow."""
         self._connection_type = None
 
@@ -107,8 +107,7 @@ class MaicoWSConfigFlow(ConfigFlow, domain=DOMAIN):
             self._connection_type = user_input[CONF_CONNECTION_TYPE]
             if self._connection_type == CONNECTION_TYPE_TCP:
                 return await self.async_step_tcp()
-            else:
-                return await self.async_step_rtu()
+            return await self.async_step_rtu()
 
         return self.async_show_form(
             step_id="user", data_schema=STEP_CONNECTION_TYPE_SCHEMA
@@ -152,7 +151,7 @@ class MaicoWSConfigFlow(ConfigFlow, domain=DOMAIN):
 class MaicoOptionsFlowHandler(OptionsFlow):
     """Handle options flow for Maico WS."""
 
-    def __init__(self, config_entry):
+    def __init__(self, config_entry) -> None:
         """Initialize options flow."""
         self.config_entry = config_entry
 

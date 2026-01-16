@@ -3,23 +3,29 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from homeassistant.components.climate import ClimateEntity, ClimateEntityFeature, HVACAction, HVACMode
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.components.climate import (
+    ClimateEntity,
+    ClimateEntityFeature,
+    HVACAction,
+    HVACMode,
+)
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
-from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from . import MaicoCoordinator
 from .const import (
     ATTR_EXTRACT_AIR_TEMP,
     ATTR_OUTDOOR_AIR_TEMP,
-    ATTR_SUPPLY_AIR_TEMP,
     DOMAIN,
 )
-from . import MaicoCoordinator
+
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,10 +39,10 @@ FAN_MODES = ["off", "auto", "low", "medium", "high"]
 # Internal mapping from VMC level to fan mode
 VENTILATION_TO_FAN_MODE = {
     0: "off",
-    1: "auto",      # Humidity protection -> auto
-    2: "low",       # Reduced -> low
-    3: "medium",    # Normal -> medium  
-    4: "high",      # Intensive -> high
+    1: "auto",  # Humidity protection -> auto
+    2: "low",  # Reduced -> low
+    3: "medium",  # Normal -> medium
+    4: "high",  # Intensive -> high
 }
 
 # Reverse mapping from fan mode to VMC level
@@ -64,20 +70,17 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
         """Initialize the climate entity."""
         super().__init__(coordinator)
         self._api = coordinator.api
-        self._attr_unique_id = f"{self._api._host}_{self._api._port}_climate"
+        self._attr_unique_id = f"{self._api.host}_{self._api.port}_climate"
         self._attr_device_info = coordinator.device_info
         self._attr_temperature_unit = UnitOfTemperature.CELSIUS
         self._attr_supported_features = (
-            ClimateEntityFeature.TARGET_TEMPERATURE
-            | ClimateEntityFeature.FAN_MODE
+            ClimateEntityFeature.TARGET_TEMPERATURE | ClimateEntityFeature.FAN_MODE
         )
         self._attr_hvac_modes = SUPPORTED_HVAC_MODES
         self._attr_fan_modes = FAN_MODES
         self._attr_min_temp = 10  # Minimum temperature in Celsius
         self._attr_max_temp = 30  # Maximum temperature in Celsius
         self._attr_target_temperature_step = 0.5
-        
-
 
     @property
     def current_temperature(self) -> float | None:
@@ -107,7 +110,8 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set new HVAC mode."""
         if hvac_mode not in self._attr_hvac_modes:
-            raise HomeAssistantError(f"Unsupported HVAC mode: {hvac_mode}")
+            msg = f"Unsupported HVAC mode: {hvac_mode}"
+            raise HomeAssistantError(msg)
 
         if hvac_mode == HVACMode.OFF:
             # Turn off VMC by setting operation mode to 0 (Off)
@@ -124,16 +128,15 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
         else:
             _LOGGER.error("Failed to set HVAC mode to %s", hvac_mode)
 
-
-
     async def async_set_fan_mode(self, fan_mode: str) -> None:
         """Set new fan mode."""
         if fan_mode not in self._attr_fan_modes:
-            raise HomeAssistantError(f"Unsupported fan mode: {fan_mode}")
+            msg = f"Unsupported fan mode: {fan_mode}"
+            raise HomeAssistantError(msg)
 
         # Map standard HA fan mode to VMC ventilation level
         level = FAN_MODE_TO_VENTILATION.get(fan_mode, 3)
-        
+
         success = await self._api.write_ventilation_level(level)
 
         if success:
@@ -148,9 +151,8 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
 
             # Validate temperature range
             if temperature < self._attr_min_temp or temperature > self._attr_max_temp:
-                raise HomeAssistantError(
-                    f"Temperature {temperature} outside range {self._attr_min_temp}-{self._attr_max_temp}"
-                )
+                msg = f"Temperature {temperature} outside range {self._attr_min_temp}-{self._attr_max_temp}"
+                raise HomeAssistantError(msg)
 
             # Note: API method name 'write_supply_air_temperature' writes to TARGET_ROOM_TEMP (553)
             # which is what we want for target temperature setting.
@@ -166,9 +168,8 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
         """Return the current running HVAC action based on operation mode."""
         if self.hvac_mode == HVACMode.OFF:
             return HVACAction.OFF
-        else:
-            # For VMC, we'll return FAN as it's primarily a ventilation system
-            return HVACAction.FAN
+        # For VMC, we'll return FAN as it's primarily a ventilation system
+        return HVACAction.FAN
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:

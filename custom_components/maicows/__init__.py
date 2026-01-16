@@ -3,19 +3,28 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import timedelta
 import logging
-from typing import Any
+from datetime import timedelta
+from typing import TYPE_CHECKING, Any
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import CONF_SLAVE_ID, DEFAULT_PORT, DEFAULT_SLAVE_ID, DOMAIN, PLATFORMS, DEFAULT_SCAN_INTERVAL
+from .const import (
+    CONF_SLAVE_ID,
+    DEFAULT_PORT,
+    DEFAULT_SCAN_INTERVAL,
+    DEFAULT_SLAVE_ID,
+    DOMAIN,
+    PLATFORMS,
+)
 from .maico_ws_api import MaicoWS
+
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +32,9 @@ _LOGGER = logging.getLogger(__name__)
 class MaicoCoordinator(DataUpdateCoordinator):
     """Class to manage fetching Maico WS320B data."""
 
-    def __init__(self, hass: HomeAssistant, api: MaicoWS320B, entry: ConfigEntry) -> None:
+    def __init__(
+        self, hass: HomeAssistant, api: MaicoWS320B, entry: ConfigEntry
+    ) -> None:
         """Initialize."""
         super().__init__(
             hass,
@@ -38,9 +49,10 @@ class MaicoCoordinator(DataUpdateCoordinator):
         """Fetch data from API endpoint."""
         data = await self.api.get_all_status()
         if data is None:
-            raise UpdateFailed("Error communicating with API")
+            msg = "Error communicating with API"
+            raise UpdateFailed(msg)
         return data
-    
+
     @property
     def device_info(self):
         """Return device info."""
@@ -83,10 +95,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     try:
         connected = await maico_api.connect()
         if not connected:
-            raise ConfigEntryNotReady(f"Could not connect to Maico WS at {conn_str}")
+            msg = f"Could not connect to Maico WS at {conn_str}"
+            raise ConfigEntryNotReady(msg)
     except Exception as e:
-        _LOGGER.error("Failed to connect to Maico WS: %s", e)
-        raise ConfigEntryNotReady(f"Failed to connect to Maico WS: {e}") from e
+        _LOGGER.exception("Failed to connect to Maico WS: %s", e)
+        msg = f"Failed to connect to Maico WS: {e}"
+        raise ConfigEntryNotReady(msg) from e
 
     # Create the coordinator
     coordinator = MaicoCoordinator(hass, maico_api, entry)
@@ -96,7 +110,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Store the coordinator instance in hass.data
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
-    
+
     # Register the device
     device_registry = dr.async_get(hass)
     device_registry.async_get_or_create(
@@ -120,6 +134,4 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN].pop(entry.entry_id)
 
     # Unload platforms
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-
-    return unload_ok
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)

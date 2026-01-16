@@ -11,76 +11,77 @@ from pymodbus.exceptions import ConnectionException, ModbusException
 
 _LOGGER = logging.getLogger(__name__)
 
+
 # Maico WS Modbus register definitions
 # Based on official documentation from KWL_Steuerung_Modbus_Parameterbeschreibung_RTU_TCP.csv
 class MaicoWSRegisters:
     """Register addresses for Maico WS VMC based on official documentation."""
 
     # Date/Time Settings
-    DATE_YEAR = 100      # Jahr
-    DATE_MONTH = 101     # Monat
-    DATE_DAY = 102       # Tag
-    TIME_HOUR = 103      # Stunde
-    TIME_MINUTE = 104    # Minute
-    TIME_SECOND = 105    # Sekunde
+    DATE_YEAR = 100  # Jahr
+    DATE_MONTH = 101  # Monat
+    DATE_DAY = 102  # Tag
+    TIME_HOUR = 103  # Stunde
+    TIME_MINUTE = 104  # Minute
+    TIME_SECOND = 105  # Sekunde
 
     # Filter Settings
     FILTER_DEVICE_MONTHS = 150  # Filterstand Gerätefilter (3-12 months)
-    FILTER_OUTDOOR_MONTHS = 151 # Filterstand Aussenfilter (3-18 months)
-    FILTER_ROOM_MONTHS = 152    # Filterstand Raumfilter (1-6 months)
+    FILTER_OUTDOOR_MONTHS = 151  # Filterstand Aussenfilter (3-18 months)
+    FILTER_ROOM_MONTHS = 152  # Filterstand Raumfilter (1-6 months)
     FILTER_CHANGE_DEVICE = 157  # Filterwechsel Gerätefilter (0=not changed, 1=changed)
-    FILTER_CHANGE_OUTDOOR = 158 # Filterwechsel Außenfilter (0=not changed, 1=changed)
-    FILTER_CHANGE_ROOM = 159    # Filterwechsel Raumfilter (0=not changed, 1=changed)
+    FILTER_CHANGE_OUTDOOR = 158  # Filterwechsel Außenfilter (0=not changed, 1=changed)
+    FILTER_CHANGE_ROOM = 159  # Filterwechsel Raumfilter (0=not changed, 1=changed)
 
     # Temperature Settings
-    ROOM_TEMP_ADJUST = 300      # Abgleich Raumtemperatur
+    ROOM_TEMP_ADJUST = 300  # Abgleich Raumtemperatur
     SUPPLY_TEMP_MIN_COOL = 301  # T-Zuluft min. kühlen
-    ROOM_TEMP_MAX = 302         # T-Raum max.
+    ROOM_TEMP_MAX = 302  # T-Raum max.
 
     # Error and Info Messages
-    CURRENT_ERROR_HI = 401      # Aktueller Fehler (High-Word)
-    CURRENT_ERROR_LO = 402      # Aktueller Fehler (Low-Word)
-    CURRENT_INFO_HI = 403       # Aktueller Hinweis (High-Word)
-    CURRENT_INFO_LO = 404       # Aktueller Hinweis (Low-Word)
-    ERROR_RESET = 405           # Fehler Reset (0=normal, 1=reset)
+    CURRENT_ERROR_HI = 401  # Aktueller Fehler (High-Word)
+    CURRENT_ERROR_LO = 402  # Aktueller Fehler (Low-Word)
+    CURRENT_INFO_HI = 403  # Aktueller Hinweis (High-Word)
+    CURRENT_INFO_LO = 404  # Aktueller Hinweis (Low-Word)
+    ERROR_RESET = 405  # Fehler Reset (0=normal, 1=reset)
 
     # Basic Settings
-    OPERATION_MODE = 550        # Operation mode (0=Off, 1=Manual, 2=Auto-Time, 3=Auto-Sensor, 4=Eco-Supply Air, 5=Eco-Extract Air)
-    BOOST_VENTILATION = 551     # Stoßlüftung (0=inaktiv, 1=aktiv)
-    SEASON = 552                # Jahreszeit (0=Winter, 1=Sommer)
-    TARGET_ROOM_TEMP = 553      # Solltemperatur Raum (°C * 10)
-    VENTILATION_LEVEL = 554     # Ventilation level (0=Off, 1=Humidity protection, 2=Reduced, 3=Nominal, 4=Intensive)
+    OPERATION_MODE = 550  # Operation mode (0=Off, 1=Manual, 2=Auto-Time, 3=Auto-Sensor, 4=Eco-Supply Air, 5=Eco-Extract Air)
+    BOOST_VENTILATION = 551  # Stoßlüftung (0=inaktiv, 1=aktiv)
+    SEASON = 552  # Jahreszeit (0=Winter, 1=Sommer)
+    TARGET_ROOM_TEMP = 553  # Solltemperatur Raum (°C * 10)
+    VENTILATION_LEVEL = 554  # Ventilation level (0=Off, 1=Humidity protection, 2=Reduced, 3=Nominal, 4=Intensive)
 
     # Ventilation Queries
     CURRENT_VENTILATION_LEVEL = 650  # Current ventilation level (0=Off, 1=Humidity protection, 2=Reduced, 3=Nominal, 4=Intensive)
-    SUPPLY_FAN_SPEED = 651           # Current supply fan speed (U/min)
-    EXTRACT_FAN_SPEED = 652          # Current extract fan speed (U/min)
-    SUPPLY_VOLUME_FLOW = 653         # Current supply volume flow (m³/h)
-    EXTRACT_VOLUME_FLOW = 654        # Current extract volume flow (m³/h)
-    FILTER_REMAIN_DEVICE = 655       # Device filter remaining time (days)
-    FILTER_REMAIN_OUTDOOR = 656      # Outdoor filter remaining time (days)
-    FILTER_REMAIN_ROOM = 657         # Room filter remaining time (days)
+    SUPPLY_FAN_SPEED = 651  # Current supply fan speed (U/min)
+    EXTRACT_FAN_SPEED = 652  # Current extract fan speed (U/min)
+    SUPPLY_VOLUME_FLOW = 653  # Current supply volume flow (m³/h)
+    EXTRACT_VOLUME_FLOW = 654  # Current extract volume flow (m³/h)
+    FILTER_REMAIN_DEVICE = 655  # Device filter remaining time (days)
+    FILTER_REMAIN_OUTDOOR = 656  # Outdoor filter remaining time (days)
+    FILTER_REMAIN_ROOM = 657  # Room filter remaining time (days)
 
     # Current Temperatures
-    ROOM_TEMP = 700                  # Room temperature (°C * 10)
-    ROOM_TEMP_EXT = 701              # External room temperature (°C * 10)
-    INLET_AIR_TEMP = 703             # Inlet air temperature (°C * 10)
-    SUPPLY_AIR_TEMP = 704            # Supply air temperature (°C * 10)
-    EXTRACT_AIR_TEMP = 705           # Extract air temperature (°C * 10)
-    EXHAUST_AIR_TEMP = 706           # Exhaust air temperature (°C * 10)
+    ROOM_TEMP = 700  # Room temperature (°C * 10)
+    ROOM_TEMP_EXT = 701  # External room temperature (°C * 10)
+    INLET_AIR_TEMP = 703  # Inlet air temperature (°C * 10)
+    SUPPLY_AIR_TEMP = 704  # Supply air temperature (°C * 10)
+    EXTRACT_AIR_TEMP = 705  # Extract air temperature (°C * 10)
+    EXHAUST_AIR_TEMP = 706  # Exhaust air temperature (°C * 10)
 
     # Humidity Data
-    EXTRACT_AIR_HUMIDITY = 750       # Extract air humidity (% * 10)
-    HUMIDITY_SENSOR_1 = 751          # Humidity sensor 1 (% * 10)
-    HUMIDITY_SENSOR_2 = 752          # Humidity sensor 2 (%10)
-    HUMIDITY_SENSOR_3 = 753          # Humidity sensor 3 (% * 10)
-    HUMIDITY_SENSOR_4 = 754          # Humidity sensor 4 (% * 10)
+    EXTRACT_AIR_HUMIDITY = 750  # Extract air humidity (% * 10)
+    HUMIDITY_SENSOR_1 = 751  # Humidity sensor 1 (% * 10)
+    HUMIDITY_SENSOR_2 = 752  # Humidity sensor 2 (%10)
+    HUMIDITY_SENSOR_3 = 753  # Humidity sensor 3 (% * 10)
+    HUMIDITY_SENSOR_4 = 754  # Humidity sensor 4 (% * 10)
 
     # Switch States
-    SUPPLY_FAN_STATE = 800           # Supply fan state (0=off, 1=on)
-    EXTRACT_FAN_STATE = 801          # Extract fan state (0=off, 1=on)
-    BYPASS_ACTUATOR = 802            # Summer bypass actuator (0=closed, 1=open)
-    PTC_HEATER = 803                 # PTC heater (0=off, 1=on)
+    SUPPLY_FAN_STATE = 800  # Supply fan state (0=off, 1=on)
+    EXTRACT_FAN_STATE = 801  # Extract fan state (0=off, 1=on)
+    BYPASS_ACTUATOR = 802  # Summer bypass actuator (0=closed, 1=open)
+    PTC_HEATER = 803  # PTC heater (0=off, 1=on)
 
 
 class MaicoWS:
@@ -93,9 +94,10 @@ class MaicoWS:
         serial_port: str | None = None,
         baudrate: int = 9600,
         slave_id: int = 1,
-    ):
-        """Initialize the Maico WS API.
-        
+    ) -> None:
+        """
+        Initialize the Maico WS API.
+
         For TCP: provide host and port
         For RTU: provide serial_port and baudrate
         """
@@ -107,6 +109,21 @@ class MaicoWS:
         self._client: AsyncModbusTcpClient | AsyncModbusSerialClient | None = None
         self._connected = False
         self._is_rtu = serial_port is not None
+
+    @property
+    def host(self) -> str | None:
+        """Return the host."""
+        return self._host
+
+    @property
+    def port(self) -> int:
+        """Return the port."""
+        return self._port
+
+    @property
+    def slave_id(self) -> int:
+        """Return the slave id."""
+        return self._slave_id
 
     async def connect(self) -> bool:
         """Connect to the Maico WS device."""
@@ -132,7 +149,9 @@ class MaicoWS:
                     host=self._host,
                     port=self._port,
                 )
-                _LOGGER.debug("Connecting to Maico WS via TCP: %s:%d", self._host, self._port)
+                _LOGGER.debug(
+                    "Connecting to Maico WS via TCP: %s:%d", self._host, self._port
+                )
 
             result = await self._client.connect()
             if result:
@@ -140,15 +159,14 @@ class MaicoWS:
                 connection_type = "RTU" if self._is_rtu else "TCP"
                 _LOGGER.debug("Connected to Maico WS via %s", connection_type)
                 return True
-            else:
-                connection_type = "RTU" if self._is_rtu else "TCP"
-                _LOGGER.error("Failed to connect to Maico WS via %s", connection_type)
-                return False
+            connection_type = "RTU" if self._is_rtu else "TCP"
+            _LOGGER.error("Failed to connect to Maico WS via %s", connection_type)
+            return False
         except ConnectionException as e:
-            _LOGGER.error("Connection error to Maico WS: %s", e)
+            _LOGGER.exception("Connection error to Maico WS: %s", e)
             return False
         except Exception as e:
-            _LOGGER.error("Unexpected error during connection: %s", e)
+            _LOGGER.exception("Unexpected error during connection: %s", e)
             return False
 
     async def disconnect(self) -> None:
@@ -172,7 +190,9 @@ class MaicoWS:
             )
 
             if response.isError():
-                _LOGGER.error("Error reading temperature register %d: %s", register, response)
+                _LOGGER.error(
+                    "Error reading temperature register %d: %s", register, response
+                )
                 return None
 
             # Convert unsigned 16-bit to signed 16-bit
@@ -180,14 +200,15 @@ class MaicoWS:
             if raw_value > 32767:
                 raw_value -= 65536
             # Temperature values are stored in 0.1°C increments
-            temperature = raw_value / 10.0
-            return temperature
+            return raw_value / 10.0
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading temperature register %d: %s", register, e)
+            _LOGGER.exception(
+                "Modbus error reading temperature register %d: %s", register, e
+            )
             return None
         except Exception as e:
-            _LOGGER.error("Error reading temperature register %d: %s", register, e)
+            _LOGGER.exception("Error reading temperature register %d: %s", register, e)
             return None
 
     async def read_humidity(self, register: int) -> int | None:
@@ -204,7 +225,9 @@ class MaicoWS:
             )
 
             if response.isError():
-                _LOGGER.error("Error reading humidity register %d: %s", register, response)
+                _LOGGER.error(
+                    "Error reading humidity register %d: %s", register, response
+                )
                 return None
 
             raw_value = response.registers[0]
@@ -212,10 +235,12 @@ class MaicoWS:
             return int(humidity)
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading humidity register %d: %s", register, e)
+            _LOGGER.exception(
+                "Modbus error reading humidity register %d: %s", register, e
+            )
             return None
         except Exception as e:
-            _LOGGER.error("Error reading humidity register %d: %s", register, e)
+            _LOGGER.exception("Error reading humidity register %d: %s", register, e)
             return None
 
     async def read_fan_speed(self, register: int) -> int | None:
@@ -232,17 +257,20 @@ class MaicoWS:
             )
 
             if response.isError():
-                _LOGGER.error("Error reading fan speed register %d: %s", register, response)
+                _LOGGER.error(
+                    "Error reading fan speed register %d: %s", register, response
+                )
                 return None
 
-            raw_value = response.registers[0]
-            return raw_value
+            return response.registers[0]
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading fan speed register %d: %s", register, e)
+            _LOGGER.exception(
+                "Modbus error reading fan speed register %d: %s", register, e
+            )
             return None
         except Exception as e:
-            _LOGGER.error("Error reading fan speed register %d: %s", register, e)
+            _LOGGER.exception("Error reading fan speed register %d: %s", register, e)
             return None
 
     async def read_current_ventilation_level(self) -> int | None:
@@ -262,14 +290,14 @@ class MaicoWS:
                 _LOGGER.error("Error reading current ventilation level: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
             return level
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading current ventilation level: %s", e)
+            _LOGGER.exception("Modbus error reading current ventilation level: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading current ventilation level: %s", e)
+            _LOGGER.exception("Error reading current ventilation level: %s", e)
             return None
 
     async def read_supply_air_temperature(self) -> float | None:
@@ -313,14 +341,14 @@ class MaicoWS:
                 _LOGGER.error("Error reading supply fan speed: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
             return speed
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading supply fan speed: %s", e)
+            _LOGGER.exception("Modbus error reading supply fan speed: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading supply fan speed: %s", e)
+            _LOGGER.exception("Error reading supply fan speed: %s", e)
             return None
 
     async def read_extract_fan_speed(self) -> int | None:
@@ -340,14 +368,14 @@ class MaicoWS:
                 _LOGGER.error("Error reading extract fan speed: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
             return speed
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading extract fan speed: %s", e)
+            _LOGGER.exception("Modbus error reading extract fan speed: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading extract fan speed: %s", e)
+            _LOGGER.exception("Error reading extract fan speed: %s", e)
             return None
 
     async def read_power_state(self) -> bool | None:
@@ -372,10 +400,10 @@ class MaicoWS:
             return operation_mode != 0
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading power state: %s", e)
+            _LOGGER.exception("Modbus error reading power state: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading power state: %s", e)
+            _LOGGER.exception("Error reading power state: %s", e)
             return None
 
     async def read_filter_status(self) -> dict[str, int] | None:
@@ -417,10 +445,10 @@ class MaicoWS:
             return status
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading filter status: %s", e)
+            _LOGGER.exception("Modbus error reading filter status: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading filter status: %s", e)
+            _LOGGER.exception("Error reading filter status: %s", e)
             return None
 
     async def read_fault_status(self) -> str | None:
@@ -453,15 +481,14 @@ class MaicoWS:
             # If both registers are 0, no errors
             if error_hi == 0 and error_lo == 0:
                 return "no_fault"
-            else:
-                # Return combined error code
-                return f"error_hi_{error_hi}_lo_{error_lo}"
+            # Return combined error code
+            return f"error_hi_{error_hi}_lo_{error_lo}"
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading fault status: %s", e)
+            _LOGGER.exception("Modbus error reading fault status: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading fault status: %s", e)
+            _LOGGER.exception("Error reading fault status: %s", e)
             return None
 
     async def read_info_messages(self) -> str | None:
@@ -494,15 +521,14 @@ class MaicoWS:
             # If both registers are 0, no info messages
             if info_hi == 0 and info_lo == 0:
                 return "no_info"
-            else:
-                # Return combined info code
-                return f"info_hi_{info_hi}_lo_{info_lo}"
+            # Return combined info code
+            return f"info_hi_{info_hi}_lo_{info_lo}"
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading info messages: %s", e)
+            _LOGGER.exception("Modbus error reading info messages: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading info messages: %s", e)
+            _LOGGER.exception("Error reading info messages: %s", e)
             return None
 
     async def read_operation_mode(self) -> str | None:
@@ -522,7 +548,7 @@ class MaicoWS:
                 _LOGGER.error("Error reading operation mode: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
 
             # Map mode codes to human-readable strings based on documentation
             # 0=Aus, 1=Manuell, 2=Auto-Zeit, 3=Auto-Sensor, 4=Eco-Zuluft, 5=Eco-Abluft
@@ -532,16 +558,16 @@ class MaicoWS:
                 2: "auto_time",
                 3: "auto_sensor",
                 4: "eco_supply",
-                5: "eco_extract"
+                5: "eco_extract",
             }
 
             return mode_map.get(mode_code, f"unknown_{mode_code}")
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading operation mode: %s", e)
+            _LOGGER.exception("Modbus error reading operation mode: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading operation mode: %s", e)
+            _LOGGER.exception("Error reading operation mode: %s", e)
             return None
 
     async def read_fault_status(self) -> str | None:
@@ -561,19 +587,18 @@ class MaicoWS:
                 _LOGGER.error("Error reading fault status: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
 
             # Return fault code or "no_fault" if 0
             if fault_code == 0:
                 return "no_fault"
-            else:
-                return f"fault_{fault_code}"
+            return f"fault_{fault_code}"
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading fault status: %s", e)
+            _LOGGER.exception("Modbus error reading fault status: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading fault status: %s", e)
+            _LOGGER.exception("Error reading fault status: %s", e)
             return None
 
     async def read_info_messages(self) -> str | None:
@@ -593,19 +618,18 @@ class MaicoWS:
                 _LOGGER.error("Error reading info messages: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
 
             # Return info code or "no_info" if 0
             if info_code == 0:
                 return "no_info"
-            else:
-                return f"info_{info_code}"
+            return f"info_{info_code}"
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading info messages: %s", e)
+            _LOGGER.exception("Modbus error reading info messages: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading info messages: %s", e)
+            _LOGGER.exception("Error reading info messages: %s", e)
             return None
 
     async def read_bypass_status(self) -> bool | None:
@@ -625,15 +649,15 @@ class MaicoWS:
                 _LOGGER.error("Error reading bypass actuator status: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
             # 0=zu (closed), 1=auf (open)
             return bool(status)
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading bypass actuator status: %s", e)
+            _LOGGER.exception("Modbus error reading bypass actuator status: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading bypass actuator status: %s", e)
+            _LOGGER.exception("Error reading bypass actuator status: %s", e)
             return None
 
     async def read_supply_fan_state(self) -> bool | None:
@@ -653,15 +677,15 @@ class MaicoWS:
                 _LOGGER.error("Error reading supply fan state: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
             # 0=aus (off), 1=ein (on)
             return bool(state)
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading supply fan state: %s", e)
+            _LOGGER.exception("Modbus error reading supply fan state: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading supply fan state: %s", e)
+            _LOGGER.exception("Error reading supply fan state: %s", e)
             return None
 
     async def read_extract_fan_state(self) -> bool | None:
@@ -681,15 +705,15 @@ class MaicoWS:
                 _LOGGER.error("Error reading extract fan state: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
             # 0=aus (off), 1=ein (on)
             return bool(state)
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading extract fan state: %s", e)
+            _LOGGER.exception("Modbus error reading extract fan state: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading extract fan state: %s", e)
+            _LOGGER.exception("Error reading extract fan state: %s", e)
             return None
 
     async def read_season(self) -> str | None:
@@ -714,16 +738,15 @@ class MaicoWS:
             # 0=Winter, 1=Sommer
             if raw_value == 0:
                 return "winter"
-            elif raw_value == 1:
+            if raw_value == 1:
                 return "summer"
-            else:
-                return f"unknown_{raw_value}"
+            return f"unknown_{raw_value}"
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading season setting: %s", e)
+            _LOGGER.exception("Modbus error reading season setting: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading season setting: %s", e)
+            _LOGGER.exception("Error reading season setting: %s", e)
             return None
 
     async def write_season(self, season: int) -> bool:
@@ -733,7 +756,9 @@ class MaicoWS:
             return False
 
         if season not in [0, 1]:
-            _LOGGER.error("Invalid season: %d. Must be 0 (Winter) or 1 (Summer).", season)
+            _LOGGER.error(
+                "Invalid season: %d. Must be 0 (Winter) or 1 (Summer).", season
+            )
             return False
 
         try:
@@ -751,10 +776,10 @@ class MaicoWS:
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing season %d: %s", season, e)
+            _LOGGER.exception("Modbus error writing season %d: %s", season, e)
             return False
         except Exception as e:
-            _LOGGER.error("Error writing season %d: %s", season, e)
+            _LOGGER.exception("Error writing season %d: %s", season, e)
             return False
 
     async def write_filter_change_device(self, changed: bool) -> bool:
@@ -779,10 +804,10 @@ class MaicoWS:
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing device filter change status: %s", e)
+            _LOGGER.exception("Modbus error writing device filter change status: %s", e)
             return False
         except Exception as e:
-            _LOGGER.error("Error writing device filter change status: %s", e)
+            _LOGGER.exception("Error writing device filter change status: %s", e)
             return False
 
     async def write_filter_change_outdoor(self, changed: bool) -> bool:
@@ -800,17 +825,21 @@ class MaicoWS:
             )
 
             if response.isError():
-                _LOGGER.error("Error writing outdoor filter change status: %s", response)
+                _LOGGER.error(
+                    "Error writing outdoor filter change status: %s", response
+                )
                 return False
 
             _LOGGER.debug("Outdoor filter change status set to: %s", changed)
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing outdoor filter change status: %s", e)
+            _LOGGER.exception(
+                "Modbus error writing outdoor filter change status: %s", e
+            )
             return False
         except Exception as e:
-            _LOGGER.error("Error writing outdoor filter change status: %s", e)
+            _LOGGER.exception("Error writing outdoor filter change status: %s", e)
             return False
 
     async def write_filter_change_room(self, changed: bool) -> bool:
@@ -835,10 +864,10 @@ class MaicoWS:
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing room filter change status: %s", e)
+            _LOGGER.exception("Modbus error writing room filter change status: %s", e)
             return False
         except Exception as e:
-            _LOGGER.error("Error writing room filter change status: %s", e)
+            _LOGGER.exception("Error writing room filter change status: %s", e)
             return False
 
     async def read_supply_temp_min_cool(self) -> float | None:
@@ -846,8 +875,9 @@ class MaicoWS:
         return await self.read_temperature(MaicoWSRegisters.SUPPLY_TEMP_MIN_COOL)
 
     async def write_supply_temp_min_cool(self, temperature: float) -> bool:
-        """Write minimum supply air temperature for cooling.
-        
+        """
+        Write minimum supply air temperature for cooling.
+
         Register 301 stores values directly in °C (min=8, max=29).
         NO multiplication by 10 needed - unlike register 302.
         """
@@ -856,9 +886,13 @@ class MaicoWS:
             return False
 
         # Register 301: VMC only accepts integer values 8-29 (no *10 format)
-        temp_value = int(round(temperature))
-        
-        _LOGGER.info("Writing supply_temp_min_cool: %.1f°C -> raw value: %d", temperature, temp_value)
+        temp_value = round(temperature)
+
+        _LOGGER.info(
+            "Writing supply_temp_min_cool: %.1f°C -> raw value: %d",
+            temperature,
+            temp_value,
+        )
 
         try:
             response = await self._client.write_register(
@@ -868,19 +902,24 @@ class MaicoWS:
             )
 
             if response.isError():
-                _LOGGER.error("Error writing supply temp min cool %f: %s", temperature, response)
+                _LOGGER.error(
+                    "Error writing supply temp min cool %f: %s", temperature, response
+                )
                 return False
 
             _LOGGER.info("Supply temp min cool successfully set to: %f", temperature)
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing supply temp min cool %f: %s", temperature, e)
+            _LOGGER.exception(
+                "Modbus error writing supply temp min cool %f: %s", temperature, e
+            )
             return False
         except Exception as e:
-            _LOGGER.error("Error writing supply temp min cool %f: %s", temperature, e)
+            _LOGGER.exception(
+                "Error writing supply temp min cool %f: %s", temperature, e
+            )
             return False
-
 
     async def read_room_temp_max(self) -> float | None:
         """Read max room temperature (°C * 10)."""
@@ -902,14 +941,13 @@ class MaicoWS:
             raw_value = response.registers[0]
             if raw_value > 32767:
                 raw_value -= 65536
-            temperature = raw_value / 10.0  # Convert from 0.1°C to °C
-            return temperature
+            return raw_value / 10.0  # Convert from 0.1°C to °C
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading max room temperature: %s", e)
+            _LOGGER.exception("Modbus error reading max room temperature: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading max room temperature: %s", e)
+            _LOGGER.exception("Error reading max room temperature: %s", e)
             return None
 
     async def write_room_temp_max(self, temperature: float) -> bool:
@@ -929,17 +967,23 @@ class MaicoWS:
             )
 
             if response.isError():
-                _LOGGER.error("Error writing max room temperature %f: %s", temperature, response)
+                _LOGGER.error(
+                    "Error writing max room temperature %f: %s", temperature, response
+                )
                 return False
 
             _LOGGER.debug("Max room temperature set to: %f", temperature)
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing max room temperature %f: %s", temperature, e)
+            _LOGGER.exception(
+                "Modbus error writing max room temperature %f: %s", temperature, e
+            )
             return False
         except Exception as e:
-            _LOGGER.error("Error writing max room temperature %f: %s", temperature, e)
+            _LOGGER.exception(
+                "Error writing max room temperature %f: %s", temperature, e
+            )
             return False
 
     async def write_supply_air_temperature(self, temperature: float) -> bool:
@@ -959,17 +1003,25 @@ class MaicoWS:
             )
 
             if response.isError():
-                _LOGGER.error("Error writing target room temperature %f: %s", temperature, response)
+                _LOGGER.error(
+                    "Error writing target room temperature %f: %s",
+                    temperature,
+                    response,
+                )
                 return False
 
             _LOGGER.debug("Target room temperature set to: %f", temperature)
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing target room temperature %f: %s", temperature, e)
+            _LOGGER.exception(
+                "Modbus error writing target room temperature %f: %s", temperature, e
+            )
             return False
         except Exception as e:
-            _LOGGER.error("Error writing target room temperature %f: %s", temperature, e)
+            _LOGGER.exception(
+                "Error writing target room temperature %f: %s", temperature, e
+            )
             return False
 
     async def write_operation_mode(self, mode: int) -> bool:
@@ -997,10 +1049,10 @@ class MaicoWS:
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing operation mode %d: %s", mode, e)
+            _LOGGER.exception("Modbus error writing operation mode %d: %s", mode, e)
             return False
         except Exception as e:
-            _LOGGER.error("Error writing operation mode %d: %s", mode, e)
+            _LOGGER.exception("Error writing operation mode %d: %s", mode, e)
             return False
 
     async def read_current_supply_volume_flow(self) -> int | None:
@@ -1020,14 +1072,14 @@ class MaicoWS:
                 _LOGGER.error("Error reading current supply volume flow: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
             return flow
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading current supply volume flow: %s", e)
+            _LOGGER.exception("Modbus error reading current supply volume flow: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading current supply volume flow: %s", e)
+            _LOGGER.exception("Error reading current supply volume flow: %s", e)
             return None
 
     async def read_current_extract_volume_flow(self) -> int | None:
@@ -1047,14 +1099,14 @@ class MaicoWS:
                 _LOGGER.error("Error reading current extract volume flow: %s", response)
                 return None
 
-            raw_value = response.registers[0]
+            response.registers[0]
             return flow
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading current extract volume flow: %s", e)
+            _LOGGER.exception("Modbus error reading current extract volume flow: %s", e)
             return None
         except Exception as e:
-            _LOGGER.error("Error reading current extract volume flow: %s", e)
+            _LOGGER.exception("Error reading current extract volume flow: %s", e)
             return None
 
     async def write_power_state(self, state: bool) -> bool:
@@ -1080,10 +1132,10 @@ class MaicoWS:
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing power state: %s", e)
+            _LOGGER.exception("Modbus error writing power state: %s", e)
             return False
         except Exception as e:
-            _LOGGER.error("Error writing power state: %s", e)
+            _LOGGER.exception("Error writing power state: %s", e)
             return False
 
     async def write_ventilation_level(self, level: int) -> bool:
@@ -1093,7 +1145,9 @@ class MaicoWS:
             return False
 
         if level < 0 or level > 4:
-            _LOGGER.error("Invalid ventilation level: %d. Must be between 0 and 4.", level)
+            _LOGGER.error(
+                "Invalid ventilation level: %d. Must be between 0 and 4.", level
+            )
             return False
 
         try:
@@ -1111,10 +1165,10 @@ class MaicoWS:
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing ventilation level %d: %s", level, e)
+            _LOGGER.exception("Modbus error writing ventilation level %d: %s", level, e)
             return False
         except Exception as e:
-            _LOGGER.error("Error writing ventilation level %d: %s", level, e)
+            _LOGGER.exception("Error writing ventilation level %d: %s", level, e)
             return False
 
     async def write_supply_air_temperature(self, temperature: float) -> bool:
@@ -1134,20 +1188,28 @@ class MaicoWS:
             )
 
             if response.isError():
-                _LOGGER.error("Error writing supply air temperature %f: %s", temperature, response)
+                _LOGGER.error(
+                    "Error writing supply air temperature %f: %s", temperature, response
+                )
                 return False
 
             _LOGGER.debug("Supply air temperature set to: %f", temperature)
             return True
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error writing supply air temperature %f: %s", temperature, e)
+            _LOGGER.exception(
+                "Modbus error writing supply air temperature %f: %s", temperature, e
+            )
             return False
         except Exception as e:
-            _LOGGER.error("Error writing supply air temperature %f: %s", temperature, e)
+            _LOGGER.exception(
+                "Error writing supply air temperature %f: %s", temperature, e
+            )
             return False
 
-    async def read_holding_registers_block(self, start_address: int, count: int) -> list[int] | None:
+    async def read_holding_registers_block(
+        self, start_address: int, count: int
+    ) -> list[int] | None:
         """Read a block of holding registers."""
         if not self._connected:
             _LOGGER.error("Not connected to Maico WS320B")
@@ -1161,16 +1223,22 @@ class MaicoWS:
             )
 
             if response.isError():
-                _LOGGER.error("Error reading block starting at %d: %s", start_address, response)
+                _LOGGER.error(
+                    "Error reading block starting at %d: %s", start_address, response
+                )
                 return None
 
             return response.registers
 
         except ModbusException as e:
-            _LOGGER.error("Modbus error reading block starting at %d: %s", start_address, e)
+            _LOGGER.exception(
+                "Modbus error reading block starting at %d: %s", start_address, e
+            )
             return None
         except Exception as e:
-            _LOGGER.error("Error reading block starting at %d: %s", start_address, e)
+            _LOGGER.exception(
+                "Error reading block starting at %d: %s", start_address, e
+            )
             return None
 
     async def get_all_status(self) -> dict[str, Any] | None:
@@ -1182,32 +1250,41 @@ class MaicoWS:
         # Execute all Modbus reads in parallel for maximum performance
         # This reduces total request time from ~900ms (sequential) to ~150ms (parallel)
         results = await asyncio.gather(
-            self.read_holding_registers_block(300, 3),   # Settings
-            self.read_holding_registers_block(650, 8),   # Ventilation/Fans
-            self.read_holding_registers_block(700, 7),   # Temperatures
-            self.read_holding_registers_block(750, 1),   # Humidity
-            self.read_holding_registers_block(550, 5),   # Operation Mode
-            self.read_holding_registers_block(800, 4),   # Switch States
-            self.read_holding_registers_block(401, 4),   # Faults/Info
-            self.read_power_state(),                     # Power State (coil)
-            return_exceptions=True
+            self.read_holding_registers_block(300, 3),  # Settings
+            self.read_holding_registers_block(650, 8),  # Ventilation/Fans
+            self.read_holding_registers_block(700, 7),  # Temperatures
+            self.read_holding_registers_block(750, 1),  # Humidity
+            self.read_holding_registers_block(550, 5),  # Operation Mode
+            self.read_holding_registers_block(800, 4),  # Switch States
+            self.read_holding_registers_block(401, 4),  # Faults/Info
+            self.read_power_state(),  # Power State (coil)
+            return_exceptions=True,
         )
-        
+
         # Unpack results
-        settings_block, vent_block, temp_block, hum_block, op_block, switch_block, fault_block, power_state = results
-        
+        (
+            settings_block,
+            vent_block,
+            temp_block,
+            hum_block,
+            op_block,
+            switch_block,
+            fault_block,
+            power_state,
+        ) = results
+
         # Check for exceptions in parallel reads
         for i, result in enumerate(results):
             if isinstance(result, Exception):
                 _LOGGER.warning("Error in parallel read %d: %s", i, result)
-        
+
         status: dict[str, Any] = {}
-        
+
         # Helper functions for data conversion (defined once, reused throughout)
         def to_signed(raw: int) -> float:
             """Convert unsigned 16-bit to signed integer."""
             return float(raw if raw <= 32767 else raw - 65536)
-        
+
         def to_temp(raw: int) -> float:
             """Convert signed 16-bit to temperature (divide by 10)."""
             val = raw if raw <= 32767 else raw - 65536
@@ -1222,10 +1299,13 @@ class MaicoWS:
             raw_301 = settings_block[1]
             signed_301 = raw_301 if raw_301 <= 32767 else raw_301 - 65536
             status["supply_temp_min_cool"] = float(signed_301)
-            _LOGGER.info("supply_temp_min_cool: raw=%d, result=%.1f", raw_301, status["supply_temp_min_cool"])
+            _LOGGER.info(
+                "supply_temp_min_cool: raw=%d, result=%.1f",
+                raw_301,
+                status["supply_temp_min_cool"],
+            )
             # Register 302: Temperature * 10 format (min=180=18°C, max=300=30°C)
             status["room_temp_max"] = to_temp(settings_block[2])
-
 
         # 2. Process Ventilation/Fan Status Block (650-657)
         if vent_block and not isinstance(vent_block, Exception):
@@ -1255,10 +1335,16 @@ class MaicoWS:
         # 5. Process Operation Mode Block (550-554)
         if op_block and not isinstance(op_block, Exception):
             mode_map = {
-                0: "off", 1: "manual", 2: "auto_time", 3: "auto_sensor",
-                4: "eco_supply", 5: "eco_extract"
+                0: "off",
+                1: "manual",
+                2: "auto_time",
+                3: "auto_sensor",
+                4: "eco_supply",
+                5: "eco_extract",
             }
-            status["operation_mode"] = mode_map.get(op_block[0], f"unknown_{op_block[0]}")
+            status["operation_mode"] = mode_map.get(
+                op_block[0], f"unknown_{op_block[0]}"
+            )
             season_map = {0: "winter", 1: "summer"}
             status["season"] = season_map.get(op_block[2], f"unknown_{op_block[2]}")
             status["target_temperature"] = to_temp(op_block[3])
@@ -1272,8 +1358,16 @@ class MaicoWS:
         # 7. Process Faults/Info Block (401-404)
         if fault_block and not isinstance(fault_block, Exception):
             err_hi, err_lo, info_hi, info_lo = fault_block
-            status["fault_status"] = "no_fault" if (err_hi == 0 and err_lo == 0) else f"error_hi_{err_hi}_lo_{err_lo}"
-            status["info_messages"] = "no_info" if (info_hi == 0 and info_lo == 0) else f"info_hi_{info_hi}_lo_{info_lo}"
+            status["fault_status"] = (
+                "no_fault"
+                if (err_hi == 0 and err_lo == 0)
+                else f"error_hi_{err_hi}_lo_{err_lo}"
+            )
+            status["info_messages"] = (
+                "no_info"
+                if (info_hi == 0 and info_lo == 0)
+                else f"info_hi_{info_hi}_lo_{info_lo}"
+            )
 
         # 8. Process Power State
         if power_state and not isinstance(power_state, Exception):

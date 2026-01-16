@@ -3,15 +3,18 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 from homeassistant.components.select import SelectEntity
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
 from . import MaicoCoordinator
+from .const import DOMAIN
+
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -46,10 +49,12 @@ async def async_setup_entry(
     """Set up the Maico WS320B select platform."""
     coordinator: MaicoCoordinator = hass.data[DOMAIN][config_entry.entry_id]
 
-    async_add_entities([
-        MaicoOperationModeSelect(coordinator),
-        MaicoSeasonSelect(coordinator),
-    ])
+    async_add_entities(
+        [
+            MaicoOperationModeSelect(coordinator),
+            MaicoSeasonSelect(coordinator),
+        ]
+    )
 
 
 class MaicoOperationModeSelect(CoordinatorEntity[MaicoCoordinator], SelectEntity):
@@ -62,7 +67,9 @@ class MaicoOperationModeSelect(CoordinatorEntity[MaicoCoordinator], SelectEntity
         """Initialize the select entity."""
         super().__init__(coordinator)
         self._api = coordinator.api
-        self._attr_unique_id = f"{self._api._host}_{self._api._port}_operation_mode_select"
+        self._attr_unique_id = (
+            f"{self._api.host}_{self._api.port}_operation_mode_select"
+        )
         self._attr_device_info = coordinator.device_info
         self._attr_options = OPERATION_MODES
         self._attr_icon = "mdi:cog"
@@ -108,7 +115,7 @@ class MaicoSeasonSelect(CoordinatorEntity[MaicoCoordinator], SelectEntity):
         """Initialize the select entity."""
         super().__init__(coordinator)
         self._api = coordinator.api
-        self._attr_unique_id = f"{self._api._host}_{self._api._port}_season_select"
+        self._attr_unique_id = f"{self._api.host}_{self._api.port}_season_select"
         self._attr_device_info = coordinator.device_info
         self._attr_options = SEASON_MODES
         self._attr_icon = "mdi:weather-sunny-off"
@@ -131,4 +138,3 @@ class MaicoSeasonSelect(CoordinatorEntity[MaicoCoordinator], SelectEntity):
             await self.coordinator.async_request_refresh()
         else:
             _LOGGER.error("Failed to set season to %s", option)
-

@@ -28,7 +28,9 @@ PLATFORMS: Final[list[str]] = ["climate", "fan", "sensor", "switch", "number", "
 ATTR_SUPPLY_AIR_TEMP: Final = "supply_air_temperature"
 ATTR_EXTRACT_AIR_TEMP: Final = "extract_air_temperature"
 ATTR_OUTDOOR_AIR_TEMP: Final = "outdoor_air_temperature"
-ATTR_SUPPLY_AIR_HUMIDITY: Final = "extract_air_humidity"  # Maico uses extract for humidity
+ATTR_SUPPLY_AIR_HUMIDITY: Final = (
+    "extract_air_humidity"  # Maico uses extract for humidity
+)
 ATTR_SUPPLY_FAN_SPEED: Final = "supply_fan_speed"
 ATTR_EXTRACT_FAN_SPEED: Final = "extract_fan_speed"
 ATTR_FAN_LEVEL: Final = "fan_level"
@@ -61,7 +63,7 @@ OPERATION_MODES: Final[list[str]] = [
     OPERATION_MODE_AUTO_TIME,
     OPERATION_MODE_AUTO_SENSOR,
     OPERATION_MODE_ECO_SUPPLY,
-    OPERATION_MODE_ECO_EXTRACT
+    OPERATION_MODE_ECO_EXTRACT,
 ]
 
 # Ventilation levels based on official documentation
@@ -76,7 +78,7 @@ VENTILATION_LEVELS: Final[list[int]] = [
     VENTILATION_LEVEL_HUMIDITY_PROTECTION,
     VENTILATION_LEVEL_REDUCED,
     VENTILATION_LEVEL_NORMAL,
-    VENTILATION_LEVEL_INTENSIVE
+    VENTILATION_LEVEL_INTENSIVE,
 ]
 
 # Season settings

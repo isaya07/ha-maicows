@@ -3,18 +3,20 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
 from homeassistant.const import (
     PERCENTAGE,
     UnitOfTemperature,
 )
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from . import MaicoCoordinator
 from .const import (
     ATTR_EXTRACT_AIR_TEMP,
     ATTR_OUTDOOR_AIR_TEMP,
@@ -23,7 +25,11 @@ from .const import (
     ATTR_SUPPLY_FAN_SPEED,
     DOMAIN,
 )
-from . import MaicoCoordinator
+
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -212,18 +218,17 @@ async def async_setup_entry(
     """Set up the Maico WS320B sensor platform."""
     coordinator: MaicoCoordinator = hass.data[DOMAIN][config_entry.entry_id]
 
-    sensors = []
-    for sensor_type in SENSOR_TYPES:
-        sensors.append(
-            MaicoWS320BSensor(
-                coordinator=coordinator,
-                key=sensor_type["key"],
-                device_class=sensor_type["device_class"],
-                unit_of_measurement=sensor_type["unit_of_measurement"],
-                attr_name=sensor_type["attr_name"],
-                icon=sensor_type.get("icon")
-            )
+    sensors = [
+        MaicoWS320BSensor(
+            coordinator=coordinator,
+            key=sensor_type["key"],
+            device_class=sensor_type["device_class"],
+            unit_of_measurement=sensor_type["unit_of_measurement"],
+            attr_name=sensor_type["attr_name"],
+            icon=sensor_type.get("icon"),
         )
+        for sensor_type in SENSOR_TYPES
+    ]
 
     async_add_entities(sensors)
 
@@ -246,11 +251,11 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
         super().__init__(coordinator)
         self._key = key
         self._attr_translation_key = key
-        self._attr_unique_id = f"{coordinator.api._host}_{coordinator.api._port}_{key}"
+        self._attr_unique_id = f"{coordinator.api.host}_{coordinator.api.port}_{key}"
         self._attr_device_info = coordinator.device_info
         self._attr_device_class = device_class
         self._attr_native_unit_of_measurement = unit_of_measurement
-        
+
         if icon:
             self._attr_icon = icon
 
@@ -262,18 +267,22 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
             return None
 
         # Special handling for individual filter sensors
-        if self._key in ("filter_device_days", "filter_outdoor_days", "filter_room_days"):
+        if self._key in (
+            "filter_device_days",
+            "filter_outdoor_days",
+            "filter_room_days",
+        ):
             filter_status = status.get("filter_status")
             if filter_status and isinstance(filter_status, dict):
                 return filter_status.get(self._key)
             return None
-        
+
         # Special handling for info messages (simplify display)
         if self._key == "info_messages":
             info_msg = status.get("info_messages")
             if info_msg == "no_info":
                 return "none"
-            elif info_msg and info_msg.startswith("info_hi_"):
+            if info_msg and info_msg.startswith("info_hi_"):
                 # Extract just the low word value for simpler display
                 parts = info_msg.split("_")
                 if len(parts) >= 4:
@@ -282,14 +291,14 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
                         return "none"
                     return f"info_{lo_value}"
             return info_msg
-        
+
         # Special handling for boolean states
         if self._key in ("supply_fan_state", "extract_fan_state"):
             return "on" if status.get(self._key) else "off"
-        
+
         if self._key == "bypass_status":
             return "open" if status.get(self._key) else "closed"
-        
+
         # Calculate heat recovery efficiency
         if self._key == "heat_recovery_efficiency":
             try:
@@ -300,35 +309,40 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
                 t_supply = status.get("supply_air_temperature")
                 t_extract = status.get("extract_air_temperature")
                 t_inlet = status.get("inlet_air_temperature")
-                
+
                 # Debug logging
                 _LOGGER.debug(
                     "Heat recovery calculation - Supply: %s, Extract: %s, Inlet: %s",
-                    t_supply, t_extract, t_inlet
+                    t_supply,
+                    t_extract,
+                    t_inlet,
                 )
-                
+
                 # All temperatures must be available
                 if t_supply is None or t_extract is None or t_inlet is None:
                     _LOGGER.debug("Heat recovery: Missing temperature data")
                     return None
-                
+
                 # Avoid division by zero
                 denominator = t_extract - t_inlet
                 if abs(denominator) < 0.1:  # Temperature difference too small
-                    _LOGGER.debug("Heat recovery: Temperature difference too small (%s)", denominator)
+                    _LOGGER.debug(
+                        "Heat recovery: Temperature difference too small (%s)",
+                        denominator,
+                    )
                     return None
-                
+
                 # Calculate efficiency: (T_supply - T_inlet) / (T_extract - T_inlet) * 100
                 efficiency = ((t_supply - t_inlet) / denominator) * 100
-                
+
                 # Clamp to reasonable range (0-100%)
                 efficiency = max(0, min(100, efficiency))
-                
+
                 _LOGGER.debug("Heat recovery efficiency calculated: %s%%", efficiency)
                 return round(efficiency, 1)
-            except (TypeError, ValueError, ZeroDivisionError) as e:
-                _LOGGER.error("Heat recovery calculation error: %s", e)
+            except (TypeError, ValueError, ZeroDivisionError):
+                _LOGGER.exception("Heat recovery calculation error")
                 return None
-        
+
         # Direct lookup for all other sensors
         return status.get(self._key)
