@@ -1,0 +1,199 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Maico WS Konfiguration",
+        "description": "Wählen Sie den Verbindungstyp",
+        "data": {
+          "connection_type": "Verbindungstyp"
+        }
+      },
+      "tcp": {
+        "title": "Maico WS TCP Konfiguration",
+        "description": "Modbus TCP Verbindung konfigurieren",
+        "data": {
+          "host": "IP-Adresse",
+          "port": "Port",
+          "slave_id": "Modbus Slave-ID",
+          "name": "Name"
+        }
+      },
+      "rtu": {
+        "title": "Maico WS RTU Konfiguration",
+        "description": "Modbus RTU Verbindung konfigurieren",
+        "data": {
+          "serial_port": "Serielle Schnittstelle",
+          "baudrate": "Baudrate",
+          "slave_id": "Modbus Slave-ID",
+          "name": "Name"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zu Maico WS nicht möglich"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Maico WS Optionen"
+      }
+    }
+  },
+  "entity": {
+    "select": {
+      "operation_mode": {
+        "name": "Betriebsmodus",
+        "state": {
+          "off": "Aus",
+          "manual": "Manuell",
+          "auto_time": "Auto Zeit",
+          "auto_sensor": "Auto Sensor",
+          "eco_supply": "Eco Zuluft",
+          "eco_extract": "Eco Abluft"
+        }
+      },
+      "season": {
+        "name": "Jahreszeit",
+        "state": {
+          "winter": "Winter",
+          "summer": "Sommer"
+        }
+      }
+    },
+    "sensor": {
+      "supply_air_temperature": {
+        "name": "Zulufttemperatur"
+      },
+      "extract_air_temperature": {
+        "name": "Ablufttemperatur"
+      },
+      "outdoor_air_temperature": {
+        "name": "Außenlufttemperatur"
+      },
+      "extract_air_humidity": {
+        "name": "Abluftfeuchtigkeit"
+      },
+      "supply_fan_speed": {
+        "name": "Zuluft Ventilatorgeschwindigkeit"
+      },
+      "extract_fan_speed": {
+        "name": "Abluft Ventilatorgeschwindigkeit"
+      },
+      "current_supply_volume_flow": {
+        "name": "Aktueller Zuluft Volumenstrom"
+      },
+      "current_extract_volume_flow": {
+        "name": "Aktueller Abluft Volumenstrom"
+      },
+      "current_ventilation_level": {
+        "name": "Aktuelle Lüftungsstufe"
+      },
+      "filter_device_days": {
+        "name": "Gerätefilter (Tage verbleibend)"
+      },
+      "filter_outdoor_days": {
+        "name": "Außenfilter (Tage verbleibend)"
+      },
+      "filter_room_days": {
+        "name": "Raumfilter (Tage verbleibend)"
+      },
+      "room_temperature": {
+        "name": "Raumtemperatur"
+      },
+      "inlet_air_temperature": {
+        "name": "Lufteintrittstemperatur"
+      },
+      "exhaust_air_temperature": {
+        "name": "Fortlufttemperatur"
+      },
+      "season": {
+        "name": "Jahreszeit",
+        "state": {
+          "winter": "Winter",
+          "summer": "Sommer"
+        }
+      },
+      "operation_mode": {
+        "name": "Betriebsmodus"
+      },
+      "fault_status": {
+        "name": "Fehlerstatus"
+      },
+      "info_messages": {
+        "name": "Informationsmeldungen",
+        "state": {
+          "none": "Keine",
+          "no_info": "Keine"
+        }
+      },
+      "bypass_status": {
+        "name": "Bypass-Status",
+        "state": {
+          "open": "Offen",
+          "closed": "Geschlossen"
+        }
+      },
+      "supply_fan_state": {
+        "name": "Zuluftventilator Status",
+        "state": {
+          "on": "Ein",
+          "off": "Aus"
+        }
+      },
+      "extract_fan_state": {
+        "name": "Abluftventilator Status",
+        "state": {
+          "on": "Ein",
+          "off": "Aus"
+        }
+      },
+      "heat_recovery_efficiency": {
+        "name": "Wärmerückgewinnungseffizienz"
+      }
+    },
+    "climate": {
+      "maico_climate": {
+        "name": "Klima",
+        "state_attributes": {
+          "fan_mode": {
+            "state": {
+              "off": "Aus",
+              "auto": "Feuchteschutz",
+              "low": "Reduziert",
+              "medium": "Normal",
+              "high": "Intensiv"
+            }
+          }
+        }
+      }
+    },
+    "fan": {
+      "maico_fan": {
+        "name": "Lüftung"
+      }
+    },
+    "switch": {
+      "power": {
+        "name": "Stromversorgung"
+      },
+      "filter_change_device": {
+        "name": "Gerätefilter wechseln"
+      },
+      "filter_change_outdoor": {
+        "name": "Außenfilter wechseln"
+      },
+      "filter_change_room": {
+        "name": "Raumfilter wechseln"
+      }
+    },
+    "number": {
+      "supply_temp_min_cool": {
+        "name": "Min. Zulufttemperatur"
+      },
+      "room_temp_max": {
+        "name": "Max. Raumtemperatur"
+      }
+    }
+  }
+}

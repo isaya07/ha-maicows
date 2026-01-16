@@ -1,0 +1,23 @@
+{
+  "entity": {
+    "climate": {
+      "maico_ws320b": {
+        "default": "mdi:air-conditioner",
+        "state_attributes": {
+          "fan_mode": {
+            "off": "mdi:fan-off",
+            "humidity_protection": "mdi:water-percent",
+            "reduced": "mdi:fan-speed-1",
+            "normal": "mdi:fan-speed-2",
+            "intensive": "mdi:fan-speed-3"
+          }
+        }
+      }
+    },
+    "sensor": {
+      "current_ventilation_level": {
+        "default": "mdi:fan-speed-1"
+      }
+    }
+  }
+}
