@@ -1,7 +1,6 @@
 {
   "domain": "maicows",
   "name": "Maico WS VMC",
-  "version": "1.0.0",
   "codeowners": [
     "@isaya"
   ],
@@ -9,11 +8,12 @@
   "dependencies": [],
   "documentation": "https://github.com/isaya07/ha-maicows",
   "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/isaya07/ha-maicows/issues",
   "loggers": [
     "pymodbus"
   ],
-  "issue_tracker": "https://github.com/isaya07/ha-maicows/issues",
   "requirements": [
     "pymodbus>=3.0.0"
-  ]
+  ],
+  "version": "1.0.0"
 }

@@ -100,17 +100,8 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         if ventilation_level is None:
             return None
 
-        if ventilation_level == 0:
-            return 0
-        if ventilation_level == 1:
-            return 25
-        if ventilation_level == 2:
-            return 50
-        if ventilation_level == 3:
-            return 75
-        if ventilation_level == 4:
-            return 100
-        return 50
+        # Map 0-4 to 0, 25, 50, 75, 100
+        return ventilation_level * 25
 
     @property
     def preset_mode(self) -> str | None:
@@ -119,17 +110,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         if ventilation_level is None:
             return None
 
-        if ventilation_level == 0:
-            return "off"
-        if ventilation_level == 1:
-            return "humidity_protection"
-        if ventilation_level == 2:
-            return "reduced"
-        if ventilation_level == 3:
-            return "normal"
-        if ventilation_level == 4:
-            return "intensive"
-        return "normal"
+        return LEVEL_TO_SPEED.get(ventilation_level, "normal")
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set the preset mode (fan level) based on official documentation."""
@@ -137,21 +118,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
             msg = f"Unsupported preset mode: {preset_mode}"
             raise HomeAssistantError(msg)
 
-        # Map preset mode to ventilation level based on official documentation
-        level = 0
-        if preset_mode == "off":
-            level = 0
-        elif preset_mode == "humidity_protection":
-            level = 1
-        elif preset_mode == "reduced":
-            level = 2
-        elif preset_mode == "normal":
-            level = 3
-        elif preset_mode == "intensive":
-            level = 4
-        else:
-            _LOGGER.error("Invalid preset mode: %s", preset_mode)
-            return
+        level = SPEED_TO_LEVEL.get(preset_mode, 3)  # Default to normal
 
         # Ensure the device is turned on when setting a level
         if level != 0 and not self.is_on:  # Only turn on if not setting to "off"
@@ -186,15 +153,9 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
                     return
 
             # Map percentage to ventilation level based on official documentation
-            level = 3  # Default normal
-            if percentage <= 20:
-                level = 1  # Humidity protection
-            elif percentage <= 40:
-                level = 2  # Reduced
-            elif percentage <= 60:
-                level = 3  # Nominal
-            else:
-                level = 4  # Intensive
+            # Simple mapping: 1-25=1, 26-50=2, 51-75=3, 76-100=4
+            level = (percentage + 24) // 25
+            level = max(1, min(4, level))
 
             # Set the ventilation level
             level_success = await self._api.write_ventilation_level(level)

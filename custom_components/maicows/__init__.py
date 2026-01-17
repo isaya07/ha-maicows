@@ -57,7 +57,7 @@ class MaicoCoordinator(DataUpdateCoordinator):
     def device_info(self):
         """Return device info."""
         return {
-            "identifiers": {(DOMAIN, f"{self.api._host}_{self.api._port}")},
+            "identifiers": {(DOMAIN, f"{self.api.host}_{self.api.port}")},
             "name": self.entry.title,
             "manufacturer": "Maico",
             "model": "WS",
