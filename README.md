@@ -1,6 +1,6 @@
 # Maico WS VMC Integration
 
-[![GitHub Release](https://img.shields.io/github/release/isaya/ha-maicows.svg?style=flat-square)](https://github.com/isaya/ha-maicows/releases)
+[![GitHub Release](https://img.shields.io/github/release/isaya/ha-maicows.svg?style=flat-square)](https://github.com/isaya07/ha-maicows/releases)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=flat-square)](https://github.com/hacs/integration)
 
 Integration for Maico WS VMC ventilation systems for Home Assistant.
