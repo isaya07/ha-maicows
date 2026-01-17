@@ -6,10 +6,10 @@
         "state_attributes": {
           "fan_mode": {
             "off": "mdi:fan-off",
-            "humidity_protection": "mdi:water-percent",
-            "reduced": "mdi:fan-speed-1",
-            "normal": "mdi:fan-speed-2",
-            "intensive": "mdi:fan-speed-3"
+            "auto": "mdi:water-percent",
+            "low": "mdi:fan-speed-1",
+            "medium": "mdi:fan-speed-2",
+            "high": "mdi:fan-speed-3"
           }
         }
       }
