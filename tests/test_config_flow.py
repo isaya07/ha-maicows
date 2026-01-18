@@ -1,17 +1,16 @@
 """Tests for the Maico WS config flow."""
-from unittest.mock import MagicMock, patch
 
-import pytest
+from unittest.mock import patch
+
 from homeassistant import config_entries, data_entry_flow
-from homeassistant.const import CONF_HOST, CONF_PORT, CONF_NAME
+from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
 from homeassistant.core import HomeAssistant
 
 from custom_components.maicows.const import (
-    DOMAIN, 
-    CONF_SERIAL_NUMBER, 
-    CONF_SLAVE_ID,
     CONF_CONNECTION_TYPE,
-    CONNECTION_TYPE_TCP
+    CONF_SLAVE_ID,
+    CONNECTION_TYPE_TCP,
+    DOMAIN,
 )
 
 
@@ -61,14 +60,16 @@ async def test_form(hass: HomeAssistant, mock_maico_ws_client):
 
 async def test_form_cannot_connect(hass: HomeAssistant, mock_maico_ws_client):
     """Test we handle cannot connect error."""
+
     async def mock_connect_fail():
         return False
+
     mock_maico_ws_client.connect.side_effect = mock_connect_fail
-    
+
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
-    
+
     # Step 1
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],

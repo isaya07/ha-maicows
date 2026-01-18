@@ -15,6 +15,22 @@ ignore = [
     "ISC001", # incompatible with formatter
 ]
 
+[lint.per-file-ignores]
+# Tests use assert, often have unused fixture args, and may lack type hints
+"tests/**/*" = [
+    "S101", # Use of assert detected
+    "ARG001", # Unused function argument (fixtures)
+    "ANN201", # Missing return type annotation for public function
+    "ANN001", # Missing type annotation for function argument
+    "ANN101", # Missing type annotation for self in method
+    "ANN202", # Missing return type annotation for private function
+    "ANN002", # Missing type annotation for *args
+    "ANN003", # Missing type annotation for **kwargs
+    "PLR2004", # Magic value used in comparison
+    "SLF001", # Private member accessed
+    "D104",   # Missing docstring in public package
+]
+
 [lint.flake8-pytest-style]
 fixture-parentheses = false
 
