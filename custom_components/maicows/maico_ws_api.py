@@ -1510,6 +1510,19 @@ class MaicoWS:
         """Return connection status."""
         return self._connected
 
+    async def get_device_info(self) -> dict[str, Any] | None:
+        """Get device information."""
+        if not self._connected:
+            return None
+
+        # Read Operation Mode to verify connection
+        val = await self.read_holding_register(MaicoWSRegisters.OPERATION_MODE)
+        if val is None:
+            return None
+
+        # Return a default serial number as specific register is undocumented
+        return {"serial_number": "maico_ws320b_device"}
+
     # Alias for backward compatibility and integration usage
     async def read_all_registers(self) -> dict[str, Any] | None:
         """Read all registers (alias for get_all_status)."""

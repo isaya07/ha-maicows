@@ -51,9 +51,29 @@ Pour tester vos modifications, vous pouvez lancer une instance de Home Assistant
 
 ## Tests
 
-Actuellement, le projet ne contient pas de tests automatisés (`tests/` n'existe pas). Pour assurer la stabilité de votre intégration à long terme, il est recommandé d'ajouter des tests unitaires utilisant `pytest`.
+Ce projet contient une suite de tests unitaires utilisant `pytest`.
 
-Vous pouvez vous inspirer de la documentation officielle : [Testing Home Assistant Integrations](https://developers.home-assistant.io/docs/testing_custom_component_p1).
+### Prérequis des tests
+
+Les dépendances de test sont listées dans `requirements_test.txt`. Elles sont installées automatiquement dans le Dev Container ou vous pouvez les installer manuellement :
+
+```bash
+pip install -r requirements_test.txt
+```
+
+### Lancer les tests
+
+Pour exécuter tous les tests unitaires :
+
+```bash
+pytest
+```
+
+Pour exécuter un fichier de test spécifique :
+
+```bash
+pytest tests/test_maico_ws_api.py
+```
 
 ## Débogage
 
