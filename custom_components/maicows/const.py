@@ -12,6 +12,7 @@ CONF_SLAVE_ID: Final = "slave_id"
 CONF_CONNECTION_TYPE: Final = "connection_type"
 CONF_SERIAL_PORT: Final = "serial_port"
 CONF_BAUDRATE: Final = "baudrate"
+CONF_SERIAL_NUMBER: Final = "serial_number"
 
 # Connection types
 CONNECTION_TYPE_TCP: Final = "tcp"
@@ -22,7 +23,15 @@ DEFAULT_BAUDRATE: Final = 9600
 DEFAULT_SERIAL_PORT: Final = "/dev/ttyUSB0"
 
 # Platform setup
-PLATFORMS: Final[list[str]] = ["climate", "fan", "sensor", "switch", "number", "select"]
+PLATFORMS: Final[list[str]] = [
+    "climate",
+    "fan",
+    "sensor",
+    "switch",
+    "number",
+    "select",
+    "button",
+]
 
 # Device attributes
 ATTR_SUPPLY_AIR_TEMP: Final = "supply_air_temperature"

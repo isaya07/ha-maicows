@@ -150,6 +150,57 @@
       },
       "heat_recovery_efficiency": {
         "name": "Heat Recovery Efficiency"
+      },
+      "hours_total": {
+        "name": "Total Operating Hours"
+      },
+      "hours_humidity": {
+        "name": "Humidity Mode Hours"
+      },
+      "hours_reduced": {
+        "name": "Reduced Mode Hours"
+      },
+      "hours_nominal": {
+        "name": "Nominal Mode Hours"
+      },
+      "hours_intensive": {
+        "name": "Intensive Mode Hours"
+      },
+      "humidity_sensor_1": {
+        "name": "Humidity Sensor 1"
+      },
+      "humidity_sensor_2": {
+        "name": "Humidity Sensor 2"
+      },
+      "humidity_sensor_3": {
+        "name": "Humidity Sensor 3"
+      },
+      "humidity_sensor_4": {
+        "name": "Humidity Sensor 4"
+      },
+      "co2_sensor_1": {
+        "name": "CO2 Sensor 1"
+      },
+      "co2_sensor_2": {
+        "name": "CO2 Sensor 2"
+      },
+      "co2_sensor_3": {
+        "name": "CO2 Sensor 3"
+      },
+      "co2_sensor_4": {
+        "name": "CO2 Sensor 4"
+      },
+      "voc_sensor_1": {
+        "name": "VOC Sensor 1"
+      },
+      "voc_sensor_2": {
+        "name": "VOC Sensor 2"
+      },
+      "voc_sensor_3": {
+        "name": "VOC Sensor 3"
+      },
+      "voc_sensor_4": {
+        "name": "VOC Sensor 4"
       }
     },
     "climate": {
@@ -185,6 +236,9 @@
       },
       "filter_change_room": {
         "name": "Room Filter Change"
+      },
+      "boost_ventilation": {
+        "name": "Boost Ventilation"
       }
     },
     "number": {
@@ -193,6 +247,29 @@
       },
       "room_temp_max": {
         "name": "Max Room Temperature"
+      },
+      "filter_device_months": {
+        "name": "Device Filter Duration"
+      },
+      "filter_outdoor_months": {
+        "name": "Outdoor Filter Duration"
+      },
+      "filter_room_months": {
+        "name": "Room Filter Duration"
+      },
+      "volume_flow_reduced": {
+        "name": "Volume Flow Reduced"
+      },
+      "volume_flow_normal": {
+        "name": "Volume Flow Normal"
+      },
+      "volume_flow_intensive": {
+        "name": "Volume Flow Intensive"
+      }
+    },
+    "button": {
+      "error_reset": {
+        "name": "Reset Error"
       }
     }
   }

@@ -33,7 +33,8 @@ _LOGGER = logging.getLogger(__name__)
 SUPPORTED_HVAC_MODES = [HVACMode.OFF, HVACMode.FAN_ONLY]
 
 # Supported fan modes using standard HA constants for proper icon support
-# Mapping: 0=off, 1=auto (humidity), 2=low (reduced), 3=medium (normal), 4=high (intensive)
+# Mapping: 0=off, 1=auto (humidity), 2=low (reduced), 3=medium (normal),
+# 4=high (intensive)
 FAN_MODES = ["off", "auto", "low", "medium", "high"]
 
 # Internal mapping from VMC level to fan mode
@@ -150,12 +151,17 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
             temperature = kwargs[ATTR_TEMPERATURE]
 
             # Validate temperature range
+            # Validate temperature range
             if temperature < self._attr_min_temp or temperature > self._attr_max_temp:
-                msg = f"Temperature {temperature} outside range {self._attr_min_temp}-{self._attr_max_temp}"
+                msg = (
+                    f"Temperature {temperature} outside range "
+                    f"{self._attr_min_temp}-{self._attr_max_temp}"
+                )
                 raise HomeAssistantError(msg)
 
-            # Note: API method name 'write_supply_air_temperature' writes to TARGET_ROOM_TEMP (553)
-            # which is what we want for target temperature setting.
+            # Note: API method name 'write_supply_air_temperature' writes to
+            # TARGET_ROOM_TEMP (553) which is what we want for target temperature
+            # setting.
             success = await self._api.write_supply_air_temperature(temperature)
 
             if success:

@@ -169,7 +169,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         self,
         percentage: int | None = None,
         preset_mode: str | None = None,
-        **kwargs: Any,
+        **kwargs: Any,  # noqa: ARG002
     ) -> None:
         """Turn on the fan."""
         # Turn on the device
@@ -184,7 +184,8 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         elif percentage is not None:
             await self.async_set_percentage(percentage)
         else:
-            # Default to reduced level (2) if no specific level requested and currently off
+            # Default to reduced level (2) if no specific level requested
+            # and currently off
             current_level = self.coordinator.data.get("current_ventilation_level", 0)
             if current_level == 0:
                 level_success = await self._api.write_ventilation_level(2)
@@ -193,7 +194,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
             else:
                 await self.coordinator.async_request_refresh()
 
-    async def async_turn_off(self, **kwargs: Any) -> None:
+    async def async_turn_off(self, **kwargs: Any) -> None:  # noqa: ARG002
         """Turn off the fan."""
         success = await self._api.write_power_state(state=False)
         if success:

@@ -11,6 +11,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import MaicoCoordinator
 from .const import DOMAIN
+from .maico_ws_api import MaicoWSRegisters
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
@@ -31,6 +32,62 @@ async def async_setup_entry(
     entities = [
         MaicoWS320BSupplyTempMinCoolNumber(coordinator),
         MaicoWS320BMaxRoomTempNumber(coordinator),
+        # Filter settings
+        MaicoWS320BConfigNumber(
+            coordinator,
+            "filter_device_months",
+            MaicoWSRegisters.FILTER_DEVICE_MONTHS,
+            3,
+            12,
+            unit="months",
+            icon="mdi:calendar-range",
+        ),
+        MaicoWS320BConfigNumber(
+            coordinator,
+            "filter_outdoor_months",
+            MaicoWSRegisters.FILTER_OUTDOOR_MONTHS,
+            3,
+            18,
+            unit="months",
+            icon="mdi:calendar-range",
+        ),
+        MaicoWS320BConfigNumber(
+            coordinator,
+            "filter_room_months",
+            MaicoWSRegisters.FILTER_ROOM_MONTHS,
+            1,
+            6,
+            unit="months",
+            icon="mdi:calendar-range",
+        ),
+        # Volume flow settings
+        MaicoWS320BConfigNumber(
+            coordinator,
+            "volume_flow_reduced",
+            MaicoWSRegisters.VOLUME_FLOW_REDUCED,
+            0,
+            400,
+            unit="m³/h",
+            icon="mdi:weather-windy",
+        ),
+        MaicoWS320BConfigNumber(
+            coordinator,
+            "volume_flow_normal",
+            MaicoWSRegisters.VOLUME_FLOW_NORMAL,
+            0,
+            400,
+            unit="m³/h",
+            icon="mdi:weather-windy",
+        ),
+        MaicoWS320BConfigNumber(
+            coordinator,
+            "volume_flow_intensive",
+            MaicoWSRegisters.VOLUME_FLOW_INTENSIVE,
+            0,
+            400,
+            unit="m³/h",
+            icon="mdi:weather-windy",
+        ),
     ]
 
     async_add_entities(entities, update_before_add=True)
@@ -39,7 +96,7 @@ async def async_setup_entry(
 class MaicoWS320BSupplyTempMinCoolNumber(
     CoordinatorEntity[MaicoCoordinator], NumberEntity
 ):
-    """Representation of a Maico WS320B minimum supply air temperature for cooling setting."""
+    """Representation of a Maico WS320B min supply air temp for cooling."""
 
     _attr_has_entity_name = True
     _attr_translation_key = "supply_temp_min_cool"
@@ -102,3 +159,50 @@ class MaicoWS320BMaxRoomTempNumber(CoordinatorEntity[MaicoCoordinator], NumberEn
             await self.coordinator.async_request_refresh()
         else:
             _LOGGER.error("Failed to set max room temperature to %f", value)
+
+
+class MaicoWS320BConfigNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity):
+    """Generic number entity for Maico WS320B configuration."""
+
+    _attr_has_entity_name = True
+    _attr_mode = NumberMode.BOX
+
+    def __init__(  # noqa: PLR0913
+        self,
+        coordinator: MaicoCoordinator,
+        key: str,
+        register: int,
+        min_val: float,
+        max_val: float,
+        step: float = 1.0,
+        unit: str | None = None,
+        icon: str | None = None,
+    ) -> None:
+        """Initialize the number."""
+        super().__init__(coordinator)
+        self._key = key
+        self._register = register
+        self._attr_translation_key = key
+        self._attr_unique_id = f"{coordinator.api.host}_{coordinator.api.port}_{key}"
+        self._attr_device_info = coordinator.device_info
+        self._attr_native_min_value = min_val
+        self._attr_native_max_value = max_val
+        self._attr_native_step = step
+        self._attr_native_unit_of_measurement = unit
+        if icon:
+            self._attr_icon = icon
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the current value."""
+        return self.coordinator.data.get(self._key)
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Update the current value."""
+        success = await self.coordinator.api.write_register_value(
+            self._register, int(value)
+        )
+        if success:
+            await self.coordinator.async_request_refresh()
+        else:
+            _LOGGER.error("Failed to set %s to %f", self._key, value)

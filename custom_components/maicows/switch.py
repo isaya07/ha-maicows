@@ -5,7 +5,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.components.switch import SwitchEntity
+from homeassistant.components.switch import SwitchDeviceClass, SwitchEntity
+from homeassistant.const import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import MaicoCoordinator
@@ -29,6 +30,7 @@ async def async_setup_entry(
 
     entities = [
         MaicoWS320BPowerSwitch(coordinator),
+        MaicoWS320BBoostSwitch(coordinator),
     ]
 
     # Add filter change switches (momentary - always show as OFF)
@@ -120,3 +122,41 @@ class MaicoWS320BFilterChangeSwitch(CoordinatorEntity[MaicoCoordinator], SwitchE
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off does nothing - this is a momentary switch."""
+
+
+class MaicoWS320BBoostSwitch(CoordinatorEntity[MaicoCoordinator], SwitchEntity):
+    """Representation of the Maico WS320B Boost Ventilation switch."""
+
+    _attr_has_entity_name = True
+    _attr_translation_key = "boost_ventilation"
+    _attr_device_class = SwitchDeviceClass.SWITCH
+    _attr_entity_category = EntityCategory.CONFIG
+
+    def __init__(self, coordinator: MaicoCoordinator) -> None:
+        """Initialize the switch."""
+        super().__init__(coordinator)
+        self._api = coordinator.api
+        self._attr_unique_id = f"{self._api.host}_{self._api.port}_boost"
+        self._attr_device_info = coordinator.device_info
+        self._attr_icon = "mdi:fan-plus"
+
+    @property
+    def is_on(self) -> bool | None:
+        """Return the state of the switch."""
+        return self.coordinator.data.get("boost_ventilation")
+
+    async def async_turn_on(self, **kwargs: Any) -> None:  # noqa: ARG002
+        """Turn the switch on."""
+        success = await self.coordinator.api.write_boost_ventilation(state=True)
+        if success:
+            await self.coordinator.async_request_refresh()
+        else:
+            _LOGGER.error("Failed to turn on boost ventilation")
+
+    async def async_turn_off(self, **kwargs: Any) -> None:  # noqa: ARG002
+        """Turn the switch off."""
+        success = await self.coordinator.api.write_boost_ventilation(state=False)
+        if success:
+            await self.coordinator.async_request_refresh()
+        else:
+            _LOGGER.error("Failed to turn off boost ventilation")

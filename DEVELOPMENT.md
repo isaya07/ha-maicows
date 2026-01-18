@@ -5,7 +5,7 @@ Ce document explique comment utiliser ce dépôt pour continuer le développemen
 ## Prérequis
 
 - [Visual Studio Code](https://code.visualstudio.com/)
-- Docker (pour utiliser les Dev Containers, recommandé)
+- Portman ou Docker (pour utiliser les Dev Containers, recommandé)
 
 ## Structure du Projet
 

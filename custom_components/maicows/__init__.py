@@ -1,122 +1,113 @@
-"""The Maico WS320B VMC integration."""
+"""The Maico WS integration initialization."""
 
 from __future__ import annotations
 
-import asyncio
 import logging
 from datetime import timedelta
 from typing import TYPE_CHECKING, Any
 
-from homeassistant.const import CONF_HOST, CONF_PORT
+from homeassistant.const import CONF_HOST, CONF_PORT, Platform
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-
-from .const import (
-    CONF_SLAVE_ID,
-    DEFAULT_PORT,
-    DEFAULT_SCAN_INTERVAL,
-    DEFAULT_SLAVE_ID,
-    DOMAIN,
-    PLATFORMS,
-)
-from .maico_ws_api import MaicoWS
 
 if TYPE_CHECKING:
     from homeassistant.config_entries import ConfigEntry
     from homeassistant.core import HomeAssistant
 
+from .const import (
+    CONF_BAUDRATE,
+    CONF_CONNECTION_TYPE,
+    CONF_SERIAL_PORT,
+    CONF_SLAVE_ID,
+    CONNECTION_TYPE_RTU,
+    DOMAIN,
+)
+from .maico_ws_api import MaicoWS, MaicoWS320B
+
 _LOGGER = logging.getLogger(__name__)
+
+PLATFORMS: list[Platform] = [
+    Platform.CLIMATE,
+    Platform.FAN,
+    Platform.NUMBER,
+    Platform.SENSOR,
+    Platform.SWITCH,
+]
 
 
 class MaicoCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching Maico WS320B data."""
+    """Class to manage fetching Maico WS data."""
 
     def __init__(
         self, hass: HomeAssistant, api: MaicoWS320B, entry: ConfigEntry
     ) -> None:
         """Initialize."""
+        self.api = api
+        self.entry = entry
+
         super().__init__(
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=DEFAULT_SCAN_INTERVAL),
+            update_interval=timedelta(seconds=30),
         )
-        self.api = api
-        self.entry = entry
 
-    async def _async_update_data(self) -> dict[str, Any]:
+    async def _async_update_data(self) -> Any:
         """Fetch data from API endpoint."""
-        data = await self.api.get_all_status()
-        if data is None:
-            msg = "Error communicating with API"
+        data = await self.api.read_all_registers()
+        if not data:
+            msg = "Error reading data from Maico WS device"
             raise UpdateFailed(msg)
         return data
 
     @property
-    def device_info(self):
+    def device_info(self) -> dict:
         """Return device info."""
         return {
-            "identifiers": {(DOMAIN, f"{self.api.host}_{self.api.port}")},
-            "name": self.entry.title,
+            "identifiers": {(DOMAIN, self.entry.entry_id)},
+            "name": f"Maico WS {self.entry.entry_id}",
             "manufacturer": "Maico",
-            "model": "WS",
-            "sw_version": "1.0.0",
+            "model": "WS 320 B",
         }
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Maico WS from a config entry."""
-    from .const import (
-        CONF_BAUDRATE,
-        CONF_CONNECTION_TYPE,
-        CONF_SERIAL_PORT,
-        CONNECTION_TYPE_RTU,
-    )
-
     connection_type = entry.data.get(CONF_CONNECTION_TYPE, "tcp")
-    slave_id = entry.data.get(CONF_SLAVE_ID, DEFAULT_SLAVE_ID)
+    slave_id = entry.data.get(CONF_SLAVE_ID, 1)
 
-    # Initialize the MaicoWS API based on connection type
     if connection_type == CONNECTION_TYPE_RTU:
-        serial_port = entry.data[CONF_SERIAL_PORT]
+        # RTU / Serial
+        serial_port = entry.data.get(CONF_SERIAL_PORT, "/dev/ttyUSB0")
         baudrate = entry.data.get(CONF_BAUDRATE, 9600)
-        maico_api = MaicoWS(
-            serial_port=serial_port, baudrate=baudrate, slave_id=slave_id
-        )
-        conn_str = f"{serial_port} @ {baudrate} baud"
-    else:  # TCP
-        host = entry.data[CONF_HOST]
-        port = entry.data.get(CONF_PORT, DEFAULT_PORT)
-        maico_api = MaicoWS(host=host, port=port, slave_id=slave_id)
+        api = MaicoWS(serial_port=serial_port, baudrate=baudrate, slave_id=slave_id)
+        conn_str = f"serial {serial_port} ({baudrate} baud)"
+    else:
+        # TCP
+        host = entry.data.get(CONF_HOST)
+        port = entry.data.get(CONF_PORT, 502)
+        api = MaicoWS(host=host, port=port, slave_id=slave_id)
         conn_str = f"{host}:{port}"
 
-    # Try to connect to the device to verify connection
     try:
-        connected = await maico_api.connect()
-        if not connected:
-            msg = f"Could not connect to Maico WS at {conn_str}"
-            raise ConfigEntryNotReady(msg)
+        connected = await api.connect()
     except Exception as e:
-        _LOGGER.exception("Failed to connect to Maico WS: %s", e)
+        _LOGGER.exception("Failed to connect to Maico WS")
         msg = f"Failed to connect to Maico WS: {e}"
         raise ConfigEntryNotReady(msg) from e
 
+    if not connected:
+        msg = f"Could not connect to Maico WS at {conn_str}"
+        raise ConfigEntryNotReady(msg)
+
     # Create the coordinator
-    coordinator = MaicoCoordinator(hass, maico_api, entry)
+    coordinator = MaicoCoordinator(hass, api, entry)
 
     # Fetch initial data so we have data when entities subscribe
     await coordinator.async_config_entry_first_refresh()
 
     # Store the coordinator instance in hass.data
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
-
-    # Register the device
-    device_registry = dr.async_get(hass)
-    device_registry.async_get_or_create(
-        config_entry_id=entry.entry_id,
-        **coordinator.device_info,
-    )
 
     # Forward the setup to platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -130,8 +121,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator: MaicoCoordinator = hass.data[DOMAIN][entry.entry_id]
     await coordinator.api.disconnect()
 
-    # Remove the coordinator instance from hass.data
-    hass.data[DOMAIN].pop(entry.entry_id)
+    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
+        hass.data[DOMAIN].pop(entry.entry_id)
 
-    # Unload platforms
-    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    return unload_ok

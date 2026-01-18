@@ -150,6 +150,57 @@
       },
       "heat_recovery_efficiency": {
         "name": "Wärmerückgewinnungseffizienz"
+      },
+      "hours_total": {
+        "name": "Gesamtbetriebsstunden"
+      },
+      "hours_humidity": {
+        "name": "Betriebsstunden Feuchteschutz"
+      },
+      "hours_reduced": {
+        "name": "Betriebsstunden Reduziert"
+      },
+      "hours_nominal": {
+        "name": "Betriebsstunden Nennlüftung"
+      },
+      "hours_intensive": {
+        "name": "Betriebsstunden Intensivlüftung"
+      },
+      "humidity_sensor_1": {
+        "name": "Feuchtesensor 1"
+      },
+      "humidity_sensor_2": {
+        "name": "Feuchtesensor 2"
+      },
+      "humidity_sensor_3": {
+        "name": "Feuchtesensor 3"
+      },
+      "humidity_sensor_4": {
+        "name": "Feuchtesensor 4"
+      },
+      "co2_sensor_1": {
+        "name": "CO2-Sensor 1"
+      },
+      "co2_sensor_2": {
+        "name": "CO2-Sensor 2"
+      },
+      "co2_sensor_3": {
+        "name": "CO2-Sensor 3"
+      },
+      "co2_sensor_4": {
+        "name": "CO2-Sensor 4"
+      },
+      "voc_sensor_1": {
+        "name": "VOC-Sensor 1"
+      },
+      "voc_sensor_2": {
+        "name": "VOC-Sensor 2"
+      },
+      "voc_sensor_3": {
+        "name": "VOC-Sensor 3"
+      },
+      "voc_sensor_4": {
+        "name": "VOC-Sensor 4"
       }
     },
     "climate": {
@@ -185,6 +236,9 @@
       },
       "filter_change_room": {
         "name": "Raumfilter wechseln"
+      },
+      "boost_ventilation": {
+        "name": "Stoßlüftung (Boost)"
       }
     },
     "number": {
@@ -193,6 +247,29 @@
       },
       "room_temp_max": {
         "name": "Max. Raumtemperatur"
+      },
+      "filter_device_months": {
+        "name": "Filterstandzeit Gerät (Monate)"
+      },
+      "filter_outdoor_months": {
+        "name": "Filterstandzeit Außen (Monate)"
+      },
+      "filter_room_months": {
+        "name": "Filterstandzeit Raum (Monate)"
+      },
+      "volume_flow_reduced": {
+        "name": "Volumenstrom Reduziert"
+      },
+      "volume_flow_normal": {
+        "name": "Volumenstrom Normal"
+      },
+      "volume_flow_intensive": {
+        "name": "Volumenstrom Intensiv"
+      }
+    },
+    "button": {
+      "error_reset": {
+        "name": "Fehler zurücksetzen"
       }
     }
   }

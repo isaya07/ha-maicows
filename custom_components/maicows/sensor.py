@@ -11,8 +11,10 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.const import (
+    CONCENTRATION_PARTS_PER_MILLION,
     PERCENTAGE,
     UnitOfTemperature,
+    UnitOfTime,
 )
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
@@ -207,6 +209,142 @@ SENSOR_TYPES = [
         "attr_name": "heat_recovery_efficiency",
         "icon": "mdi:percent",
     },
+    {
+        "key": "hours_humidity",
+        "device_class": SensorDeviceClass.DURATION,
+        "state_class": SensorStateClass.TOTAL_INCREASING,
+        "unit_of_measurement": UnitOfTime.HOURS,
+        "attr_name": "hours_humidity",
+        "icon": "mdi:clock-outline",
+    },
+    {
+        "key": "hours_reduced",
+        "device_class": SensorDeviceClass.DURATION,
+        "state_class": SensorStateClass.TOTAL_INCREASING,
+        "unit_of_measurement": UnitOfTime.HOURS,
+        "attr_name": "hours_reduced",
+        "icon": "mdi:clock-outline",
+    },
+    {
+        "key": "hours_nominal",
+        "device_class": SensorDeviceClass.DURATION,
+        "state_class": SensorStateClass.TOTAL_INCREASING,
+        "unit_of_measurement": UnitOfTime.HOURS,
+        "attr_name": "hours_nominal",
+        "icon": "mdi:clock-outline",
+    },
+    {
+        "key": "hours_intensive",
+        "device_class": SensorDeviceClass.DURATION,
+        "state_class": SensorStateClass.TOTAL_INCREASING,
+        "unit_of_measurement": UnitOfTime.HOURS,
+        "attr_name": "hours_intensive",
+        "icon": "mdi:clock-outline",
+    },
+    {
+        "key": "hours_total",
+        "device_class": SensorDeviceClass.DURATION,
+        "state_class": SensorStateClass.TOTAL_INCREASING,
+        "unit_of_measurement": UnitOfTime.HOURS,
+        "attr_name": "hours_total",
+        "icon": "mdi:clock",
+    },
+    {
+        "key": "humidity_sensor_1",
+        "device_class": SensorDeviceClass.HUMIDITY,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": PERCENTAGE,
+        "attr_name": "humidity_sensor_1",
+        "icon": "mdi:water-percent",
+    },
+    {
+        "key": "humidity_sensor_2",
+        "device_class": SensorDeviceClass.HUMIDITY,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": PERCENTAGE,
+        "attr_name": "humidity_sensor_2",
+        "icon": "mdi:water-percent",
+    },
+    {
+        "key": "humidity_sensor_3",
+        "device_class": SensorDeviceClass.HUMIDITY,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": PERCENTAGE,
+        "attr_name": "humidity_sensor_3",
+        "icon": "mdi:water-percent",
+    },
+    {
+        "key": "humidity_sensor_4",
+        "device_class": SensorDeviceClass.HUMIDITY,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": PERCENTAGE,
+        "attr_name": "humidity_sensor_4",
+        "icon": "mdi:water-percent",
+    },
+    {
+        "key": "co2_sensor_1",
+        "device_class": SensorDeviceClass.CO2,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
+        "attr_name": "co2_sensor_1",
+        "icon": "mdi:molecule-co2",
+    },
+    {
+        "key": "co2_sensor_2",
+        "device_class": SensorDeviceClass.CO2,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
+        "attr_name": "co2_sensor_2",
+        "icon": "mdi:molecule-co2",
+    },
+    {
+        "key": "co2_sensor_3",
+        "device_class": SensorDeviceClass.CO2,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
+        "attr_name": "co2_sensor_3",
+        "icon": "mdi:molecule-co2",
+    },
+    {
+        "key": "co2_sensor_4",
+        "device_class": SensorDeviceClass.CO2,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
+        "attr_name": "co2_sensor_4",
+        "icon": "mdi:molecule-co2",
+    },
+    {
+        "key": "voc_sensor_1",
+        "device_class": SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
+        "attr_name": "voc_sensor_1",
+        "icon": "mdi:cloud",
+    },
+    {
+        "key": "voc_sensor_2",
+        "device_class": SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
+        "attr_name": "voc_sensor_2",
+        "icon": "mdi:cloud",
+    },
+    {
+        "key": "voc_sensor_3",
+        "device_class": SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
+        "attr_name": "voc_sensor_3",
+        "icon": "mdi:cloud",
+    },
+    {
+        "key": "voc_sensor_4",
+        "device_class": SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
+        "state_class": SensorStateClass.MEASUREMENT,
+        "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
+        "attr_name": "voc_sensor_4",
+        "icon": "mdi:cloud",
+    },
 ]
 
 
@@ -223,6 +361,7 @@ async def async_setup_entry(
             coordinator=coordinator,
             key=sensor_type["key"],
             device_class=sensor_type["device_class"],
+            state_class=sensor_type.get("state_class"),
             unit_of_measurement=sensor_type["unit_of_measurement"],
             attr_name=sensor_type["attr_name"],
             icon=sensor_type.get("icon"),
@@ -238,13 +377,13 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
 
     _attr_has_entity_name = True
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         coordinator: MaicoCoordinator,
         key: str,
         device_class: SensorDeviceClass | None,
         unit_of_measurement: str | None,
-        attr_name: str,
+        attr_name: str,  # noqa: ARG002
         icon: str | None = None,
     ) -> None:
         """Initialize the sensor."""
@@ -260,7 +399,7 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
             self._attr_icon = icon
 
     @property
-    def native_value(self) -> Any:
+    def native_value(self) -> Any:  # noqa: PLR0911, PLR0912
         """Return the state of the sensor."""
         status = self.coordinator.data
         if not status:
@@ -283,13 +422,19 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
             if info_msg == "no_info":
                 return "none"
             if info_msg and info_msg.startswith("info_hi_"):
-                # Extract just the low word value for simpler display
-                parts = info_msg.split("_")
-                if len(parts) >= 4:
-                    lo_value = parts[3]
-                    if lo_value == "0":
-                        return "none"
-                    return f"info_{lo_value}"
+                # Extract just the low word value
+                try:
+                    # Message format: "category_hi_X_lo_Y"
+                    parts = info_msg.split("_")
+                    if len(parts) >= 5:  # noqa: PLR2004
+                        lo_value = int(parts[4])
+                        if lo_value == 0:
+                            return "no_info"
+                        return f"Info {lo_value}"
+                except (ValueError, IndexError):
+                    return "unknown"
+                else:
+                    return "no_info"
             return info_msg
 
         # Special handling for boolean states
@@ -303,14 +448,19 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
         if self._key == "heat_recovery_efficiency":
             try:
                 # Get temperatures from coordinator data
-                # Note: inlet_air_temperature is the outdoor/fresh air temperature (BEFORE heat recovery)
+                # inlet_air_temperature is the outdoor/fresh air temperature
+                # (BEFORE heat recovery)
                 # supply_air_temperature is the air after heat recovery
                 # extract_air_temperature is the air extracted from the house
-                t_supply = status.get("supply_air_temperature")
-                t_extract = status.get("extract_air_temperature")
-                t_inlet = status.get("inlet_air_temperature")
+                t_supply = self.coordinator.data.get("supply_air_temperature")
+                t_extract = self.coordinator.data.get("extract_air_temperature")
+                t_inlet = self.coordinator.data.get("inlet_air_temperature")
 
-                # Debug logging
+                # All temperatures must be available
+                if t_supply is None or t_extract is None or t_inlet is None:
+                    _LOGGER.debug("Heat recovery: Missing temperature data")
+                    return None
+
                 _LOGGER.debug(
                     "Heat recovery calculation - Supply: %s, Extract: %s, Inlet: %s",
                     t_supply,
@@ -318,30 +468,28 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
                     t_inlet,
                 )
 
-                # All temperatures must be available
-                if t_supply is None or t_extract is None or t_inlet is None:
-                    _LOGGER.debug("Heat recovery: Missing temperature data")
-                    return None
-
                 # Avoid division by zero
                 denominator = t_extract - t_inlet
-                if abs(denominator) < 0.1:  # Temperature difference too small
+                if abs(denominator) < 0.1:  # noqa: PLR2004
                     _LOGGER.debug(
                         "Heat recovery: Temperature difference too small (%s)",
                         denominator,
                     )
                     return None
 
-                # Calculate efficiency: (T_supply - T_inlet) / (T_extract - T_inlet) * 100
+                # Efficiency formula:
+                # Formula: (T_supply - T_inlet) divided by (T_extract - T_inlet) * 100
                 efficiency = ((t_supply - t_inlet) / denominator) * 100
 
-                # Clamp to reasonable range (0-100%)
-                efficiency = max(0, min(100, efficiency))
-
                 _LOGGER.debug("Heat recovery efficiency calculated: %s%%", efficiency)
-                return round(efficiency, 1)
-            except (TypeError, ValueError, ZeroDivisionError):
-                _LOGGER.exception("Heat recovery calculation error")
+                return round(min(max(efficiency, 0), 100), 1)
+            except (ValueError, ArithmeticError, TypeError) as e:
+                _LOGGER.debug("Error calculating heat recovery efficiency: %s", e)
+                return None
+            except Exception as e:  # noqa: BLE001
+                _LOGGER.debug(
+                    "Unexpected error calculating heat recovery efficiency: %s", e
+                )
                 return None
 
         # Direct lookup for all other sensors

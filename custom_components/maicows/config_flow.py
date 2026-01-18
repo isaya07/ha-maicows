@@ -2,16 +2,24 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import voluptuous as vol
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult, OptionsFlow
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import callback
+from homeassistant.exceptions import HomeAssistantError
 
 from .const import (
     CONF_BAUDRATE,
     CONF_CONNECTION_TYPE,
+    CONF_SERIAL_NUMBER,
     CONF_SERIAL_PORT,
     CONF_SLAVE_ID,
     CONNECTION_TYPE_RTU,
@@ -24,6 +32,8 @@ from .const import (
     DOMAIN,
 )
 from .maico_ws_api import MaicoWS
+
+_LOGGER = logging.getLogger(__name__)
 
 STEP_CONNECTION_TYPE_SCHEMA = vol.Schema(
     {
@@ -54,7 +64,7 @@ STEP_RTU_DATA_SCHEMA = vol.Schema(
 )
 
 
-async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
+async def validate_input(data: dict[str, Any]) -> dict[str, Any]:
     """Validate the user input allows us to connect."""
     connection_type = data.get(CONF_CONNECTION_TYPE)
 
@@ -75,13 +85,15 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     try:
         connected = await maico_api.connect()
         if connected:
-            await maico_api.disconnect()
-            return {"title": data[CONF_NAME]}
+            result = await maico_api.get_device_info()
+            if result and result.get(CONF_SERIAL_NUMBER):
+                await maico_api.disconnect()
+                return {"title": data[CONF_NAME]}
         msg = "Could not connect to Maico WS"
-        raise Exception(msg)
+        raise CannotConnectError(msg)  # noqa: TRY301
     except Exception as e:
         msg = f"Connection failed: {e}"
-        raise Exception(msg)
+        raise CannotConnectError(msg) from e
 
 
 class MaicoWSConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -95,7 +107,7 @@ class MaicoWSConfigFlow(ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry):
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
         """Get the options flow for this handler."""
         return MaicoOptionsFlowHandler(config_entry)
 
@@ -121,10 +133,13 @@ class MaicoWSConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             user_input[CONF_CONNECTION_TYPE] = CONNECTION_TYPE_TCP
             try:
-                info = await validate_input(self.hass, user_input)
+                info = await validate_input(user_input)
                 return self.async_create_entry(title=info["title"], data=user_input)
-            except Exception:  # pylint: disable=broad-except
+            except CannotConnectError:
                 errors["base"] = "cannot_connect"
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
 
         return self.async_show_form(
             step_id="tcp", data_schema=STEP_TCP_DATA_SCHEMA, errors=errors
@@ -138,10 +153,13 @@ class MaicoWSConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             user_input[CONF_CONNECTION_TYPE] = CONNECTION_TYPE_RTU
             try:
-                info = await validate_input(self.hass, user_input)
+                info = await validate_input(user_input)
                 return self.async_create_entry(title=info["title"], data=user_input)
-            except Exception:  # pylint: disable=broad-except
+            except CannotConnectError:
                 errors["base"] = "cannot_connect"
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown"
 
         return self.async_show_form(
             step_id="rtu", data_schema=STEP_RTU_DATA_SCHEMA, errors=errors
@@ -151,10 +169,17 @@ class MaicoWSConfigFlow(ConfigFlow, domain=DOMAIN):
 class MaicoOptionsFlowHandler(OptionsFlow):
     """Handle options flow for Maico WS."""
 
-    def __init__(self, config_entry) -> None:
+    def __init__(self, config_entry: ConfigEntry) -> None:
         """Initialize options flow."""
         self.config_entry = config_entry
 
-    async def async_step_init(self, user_input=None):
+    async def async_step_init(
+        self,
+        user_input: dict[str, Any] | None = None,  # noqa: ARG002
+    ) -> ConfigFlowResult:
         """Manage the options."""
         return self.async_show_form(step_id="init")
+
+
+class CannotConnectError(HomeAssistantError):
+    """Error to indicate we cannot connect."""

@@ -150,6 +150,57 @@
       },
       "heat_recovery_efficiency": {
         "name": "Rendement de récupération de chaleur"
+      },
+      "hours_total": {
+        "name": "Heures de fonctionnement totales"
+      },
+      "hours_humidity": {
+        "name": "Heures mode humidité"
+      },
+      "hours_reduced": {
+        "name": "Heures mode réduit"
+      },
+      "hours_nominal": {
+        "name": "Heures mode nominal"
+      },
+      "hours_intensive": {
+        "name": "Heures mode intensif"
+      },
+      "humidity_sensor_1": {
+        "name": "Capteur humidité 1"
+      },
+      "humidity_sensor_2": {
+        "name": "Capteur humidité 2"
+      },
+      "humidity_sensor_3": {
+        "name": "Capteur humidité 3"
+      },
+      "humidity_sensor_4": {
+        "name": "Capteur humidité 4"
+      },
+      "co2_sensor_1": {
+        "name": "Capteur CO2 1"
+      },
+      "co2_sensor_2": {
+        "name": "Capteur CO2 2"
+      },
+      "co2_sensor_3": {
+        "name": "Capteur CO2 3"
+      },
+      "co2_sensor_4": {
+        "name": "Capteur CO2 4"
+      },
+      "voc_sensor_1": {
+        "name": "Capteur COV 1"
+      },
+      "voc_sensor_2": {
+        "name": "Capteur COV 2"
+      },
+      "voc_sensor_3": {
+        "name": "Capteur COV 3"
+      },
+      "voc_sensor_4": {
+        "name": "Capteur COV 4"
       }
     },
     "climate": {
@@ -185,6 +236,9 @@
       },
       "filter_change_room": {
         "name": "Changement filtre pièce"
+      },
+      "boost_ventilation": {
+        "name": "Ventilation intensive (Boost)"
       }
     },
     "number": {
@@ -193,6 +247,29 @@
       },
       "room_temp_max": {
         "name": "Température max. ambiante"
+      },
+      "filter_device_months": {
+        "name": "Durée filtre appareil (Mois)"
+      },
+      "filter_outdoor_months": {
+        "name": "Durée filtre extérieur (Mois)"
+      },
+      "filter_room_months": {
+        "name": "Durée filtre pièce (Mois)"
+      },
+      "volume_flow_reduced": {
+        "name": "Débit volumique réduit"
+      },
+      "volume_flow_normal": {
+        "name": "Débit volumique normal"
+      },
+      "volume_flow_intensive": {
+        "name": "Débit volumique intensif"
+      }
+    },
+    "button": {
+      "error_reset": {
+        "name": "Réinitialiser les erreurs"
       }
     }
   }

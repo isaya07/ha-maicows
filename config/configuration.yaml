@@ -1,5 +1,32 @@
 # https://www.home-assistant.io/integrations/default_config/
-default_config:
+# default_config:
+# Manually load essential integrations to avoid go2rtc/stream dependency issues in dev
+automation:
+cloud:
+config:
+dhcp:
+energy:
+frontend:
+history:
+input_boolean:
+input_button:
+input_datetime:
+input_number:
+input_select:
+input_text:
+logbook:
+mobile_app:
+person:
+recorder:
+ssdp:
+sun:
+system_health:
+tag:
+timer:
+usb:
+webhook:
+zeroconf:
+zone:
 
 # https://www.home-assistant.io/integrations/homeassistant/
 homeassistant:

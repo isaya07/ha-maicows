@@ -2,7 +2,8 @@
 
 [![GitHub Release](https://img.shields.io/github/release/isaya07/ha-maicows.svg?style=flat-square)](https://github.com/isaya07/ha-maicows/releases)
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=flat-square)](https://github.com/hacs/integration)
-
+[![Validate with hassfest](https://github.com/isaya07/ha-maicows/actions/workflows/hassfest.yaml/badge.svg)](https://github.com/isaya07/ha-maicows/actions/workflows/hassfest.yaml)
+[![Validate with HACS](https://github.com/isaya07/ha-maicows/actions/workflows/hacs.yaml/badge.svg)](https://github.com/isaya07/ha-maicows/actions/workflows/hacs.yaml)
 Integration for Maico WS VMC ventilation systems for Home Assistant.
 
 This integration communicates with Maico ventilation units via Modbus TCP (or potentially RTU, depending on configuration).
@@ -28,6 +29,8 @@ This integration communicates with Maico ventilation units via Modbus TCP (or po
 6. Click **Add**.
 7. Close the dialog, find **Maico WS VMC** in the list, and install it.
 8. Restart Home Assistant.
+
+[![Ouvre votre instance Home Assistant et ajoute un dépôt dans la boutique communautaire Home Assistant.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=isaya07&repository=ha-maicows&category=integration)
 
 ### Manual
 
