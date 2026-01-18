@@ -1,3 +1,27 @@
+# Release v1.2.0: VOC & Quality
+
+This release brings support for **VOC (Volatile Organic Compounds) sensors**, enabling better air quality monitoring. It also includes a major overhaul of the development infrastructure with **comprehensive unit tests**, **CI/CD workflows**, and **strict linting**, ensuring higher stability and code quality.
+
+## 🚀 New Features
+
+### 🌬️ Air Quality (VOC)
+- **New Sensors:** Added 4 new VOC sensors (`voc_sensor_1` through `voc_sensor_4`) reading from registers 759-762.
+- **Integration:** These sensors are now auto-discovered and available with proper unit definitions (ppm) and translations (EN, FR, DE).
+
+### 🛠️ Developer Experience
+- **Unit Tests:** Implemented a full suite of tests (API, Config Flow, Init) using `pytest`.
+- **CI/CD:** Added GitHub Actions for automatic validation:
+  - `hassfest`: Validates the integration against Home Assistant standards.
+  - `hacs`: Validates compatibility with HACS.
+- **Linting:** Enforced strict ruff linting rules to maintain code quality.
+
+## 🐛 Fixes
+- **Modbus Stability:** Fixed `ImportError` issues with newer `pymodbus` versions by removing deprecated `BinaryPayloadDecoder`.
+- **Config Flow:** Fixed potential crash in configuration flow by properly handling `get_device_info`.
+- **Translations:** Added missing translation keys for VOC sensors in all supported languages.
+
+---
+
 # Release v1.0.0: Initial Release
 
 We are excited to announce the first stable release of the **Maico WS VMC Integration** for Home Assistant! This integration provides full control and monitoring for Maico WS (and compatible) ventilation systems via Modbus (TCP and RTU).

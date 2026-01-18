@@ -4,6 +4,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=flat-square)](https://github.com/hacs/integration)
 [![Validate with hassfest](https://github.com/isaya07/ha-maicows/actions/workflows/hassfest.yml/badge.svg)](https://github.com/isaya07/ha-maicows/actions/workflows/hassfest.yml)
 [![Validate with HACS](https://github.com/isaya07/ha-maicows/actions/workflows/hacs.yml/badge.svg)](https://github.com/isaya07/ha-maicows/actions/workflows/hacs.yml)
+
 Integration for Maico WS VMC ventilation systems for Home Assistant.
 
 This integration communicates with Maico ventilation units via Modbus TCP (or potentially RTU, depending on configuration).
