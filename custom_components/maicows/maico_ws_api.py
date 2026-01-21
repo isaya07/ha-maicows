@@ -184,7 +184,6 @@ class MaicoWS:
                 self._client = AsyncModbusTcpClient(
                     host=self._host,
                     port=self._port,
-                    name="maicows",
                 )
                 _LOGGER.debug(
                     "Connecting to Maico WS via TCP: %s:%d",

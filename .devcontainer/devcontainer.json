@@ -6,7 +6,8 @@
         8123
     ],
     "runArgs": [
-        "--userns=keep-id"
+        "--userns=keep-id",
+        "--network=host"
     ],
     "portsAttributes": {
         "8123": {

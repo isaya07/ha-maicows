@@ -1,3 +1,24 @@
+# Release v1.3.0: Stability & Compatibility
+
+This release focuses on **stability fixes** and **improved compatibility** with Home Assistant 2025.11+.
+
+## 🐛 Bug Fixes
+
+### Config Flow
+- **Fixed:** Fresh installations now work correctly. Simplified connection validation to only verify TCP connectivity (previously required additional Modbus register reads that could fail).
+
+### Missing Entities
+- **Fixed:** Restored `Platform.SELECT` to platforms list - Operation Mode and Season entities are now properly created.
+
+### Modbus Connection
+- **Fixed:** Removed `name` parameter from `AsyncModbusTcpClient` which could cause connection issues with some pymodbus versions.
+
+## 📋 Compatibility
+- Updated minimum Home Assistant version to **2025.11.3**.
+- All 11 unit tests passing.
+
+---
+
 # Release v1.2.0: VOC & Quality
 
 This release brings support for **VOC (Volatile Organic Compounds) sensors**, enabling better air quality monitoring. It also includes a major overhaul of the development infrastructure with **comprehensive unit tests**, **CI/CD workflows**, and **strict linting**, ensuring higher stability and code quality.

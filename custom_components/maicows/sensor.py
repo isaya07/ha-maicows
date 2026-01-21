@@ -382,6 +382,7 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
         coordinator: MaicoCoordinator,
         key: str,
         device_class: SensorDeviceClass | None,
+        state_class: SensorStateClass | None,
         unit_of_measurement: str | None,
         attr_name: str,  # noqa: ARG002
         icon: str | None = None,
@@ -393,6 +394,7 @@ class MaicoWS320BSensor(CoordinatorEntity[MaicoCoordinator], SensorEntity):
         self._attr_unique_id = f"{coordinator.api.host}_{coordinator.api.port}_{key}"
         self._attr_device_info = coordinator.device_info
         self._attr_device_class = device_class
+        self._attr_state_class = state_class
         self._attr_native_unit_of_measurement = unit_of_measurement
 
         if icon:

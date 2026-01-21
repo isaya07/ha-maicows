@@ -30,6 +30,7 @@ PLATFORMS: list[Platform] = [
     Platform.CLIMATE,
     Platform.FAN,
     Platform.NUMBER,
+    Platform.SELECT,
     Platform.SENSOR,
     Platform.SWITCH,
 ]
@@ -88,6 +89,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         port = entry.data.get(CONF_PORT, 502)
         api = MaicoWS(host=host, port=port, slave_id=slave_id)
         conn_str = f"{host}:{port}"
+        _LOGGER.info(
+            "Connecting to Maico WS at %s with slave_id=%d", conn_str, slave_id
+        )
 
     try:
         connected = await api.connect()

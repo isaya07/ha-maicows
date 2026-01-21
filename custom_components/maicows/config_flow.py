@@ -19,7 +19,6 @@ from homeassistant.exceptions import HomeAssistantError
 from .const import (
     CONF_BAUDRATE,
     CONF_CONNECTION_TYPE,
-    CONF_SERIAL_NUMBER,
     CONF_SERIAL_PORT,
     CONF_SLAVE_ID,
     CONNECTION_TYPE_RTU,
@@ -85,12 +84,12 @@ async def validate_input(data: dict[str, Any]) -> dict[str, Any]:
     try:
         connected = await maico_api.connect()
         if connected:
-            result = await maico_api.get_device_info()
-            if result and result.get(CONF_SERIAL_NUMBER):
-                await maico_api.disconnect()
-                return {"title": data[CONF_NAME]}
+            await maico_api.disconnect()
+            return {"title": data[CONF_NAME]}
         msg = "Could not connect to Maico WS"
         raise CannotConnectError(msg)  # noqa: TRY301
+    except CannotConnectError:
+        raise
     except Exception as e:
         msg = f"Connection failed: {e}"
         raise CannotConnectError(msg) from e
