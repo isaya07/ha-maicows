@@ -46,6 +46,9 @@ This integration communicates with Maico ventilation units via Modbus TCP (or po
 3. Search for **Maico WS VMC**.
 4. Follow the on-screen instructions to configure the connection (IP address, port, etc.).
 
+> [!IMPORTANT]
+> **RLS 1 WR Remote Control**: If you are using an RLS 1 WR remote control, make sure it is configured in **Auxiliary mode**. Otherwise, Modbus settings will be limited and some features will not be accessible.
+
 ## Development
 
 For developers who want to contribute or modify this integration, please see [DEVELOPMENT.md](DEVELOPMENT.md).
