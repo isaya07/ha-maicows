@@ -12,23 +12,15 @@ from custom_components.maicows.maico_ws_api import MaicoWS
 def mock_modbus_client():
     """Mock the AsyncModbusTcpClient."""
     with patch(
-        "custom_components.maicows.maico_ws_api.AsyncModbusTcpClient"
+        "custom_components.maicows.maico_ws.client.AsyncModbusTcpClient"
     ) as mock_client:
         client = mock_client.return_value
-        # Mock connect as an async method returning True
-        client.connect = MagicMock(return_value=True)
-        # For pymodbus v3, connect is async
-        client.connect.side_effect = None
 
-        # But wait, MagicMock isn't awaitable by default unless used as return_value
-        # of an AsyncMock
-        # Easier: make it a coroutine
         async def mock_connect():
             return True
 
         client.connect.side_effect = mock_connect
 
-        # Also need write_register to be async
         async def mock_write_register(*args, **kwargs):
             mock = MagicMock()
             mock.isError.return_value = False
@@ -36,11 +28,9 @@ def mock_modbus_client():
 
         client.write_register.side_effect = mock_write_register
 
-        # And read_holding_registers
         async def mock_read_holding_registers(address, count, device_id):
             mock = MagicMock()
             mock.isError.return_value = False
-            # Return list of correct length based on requested count
             mock.registers = [0] * count
             return mock
 
@@ -87,13 +77,7 @@ async def test_write_ventilation_level(mock_modbus_client):
     api = MaicoWS("localhost", 502)
     await api.connect()
 
-    assert await api.write_ventilation_level(1) is True
-    # Verify call arguments
-    # Note: write_register is now a coroutine side_effect, checking calls
-    # on the mock_client itself might be tricky
-    # heavily mocked objects sometimes loose call history on side_effect coroutines
-    # depending on how they are attached
-    # But let's check correct calls
+    assert await api.set_ventilation_level(1) is True
     mock_modbus_client.write_register.assert_called()
 
 
@@ -102,8 +86,8 @@ async def test_write_ventilation_level_invalid(mock_modbus_client):
     api = MaicoWS("localhost", 502)
     await api.connect()
 
-    # 0 to 4 are valid
-    assert await api.write_ventilation_level(5) is False
+    # 0 to 4 are valid, 5 is invalid
+    assert await api.set_ventilation_level(5) is False
     mock_modbus_client.write_register.assert_not_called()
 
 
@@ -116,5 +100,5 @@ async def test_modbus_exception_handling(mock_modbus_client):
         "Test Error"
     )
 
-    result = await api.read_holding_registers_block(100, 1)
+    result = await api.read_holding_registers(100, 1)
     assert result is None

@@ -1,3 +1,38 @@
+# Release v1.4.0: Refactoring & External Sensors
+
+This release brings a **major code refactoring** and **external sensor support**, enabling integration with external temperature, humidity, and air quality sensors via Modbus.
+
+## 🚀 New Features
+
+### 🌡️ External Sensor Support
+New Number entities to write external sensor values to the VMC:
+- **Room Temperature External** (register 701): Write external room temperature
+- **Room Temperature Bus** (register 707): Write bus room temperature
+- **Humidity Bus** (register 763): Write bus humidity (0-100%)
+- **Air Quality Bus** (register 764): Write bus CO2/air quality (0-5000 ppm)
+
+### 🎛️ Room Temperature Sensor Selection
+New Select entity (`select.room_temp_selection`) to choose temperature source:
+- Comfort BDE (remote control)
+- External sensor
+- Internal sensor
+- Bus (Modbus input)
+
+## 🔧 Technical Improvements
+
+### Code Refactoring
+Refactored `maico_ws_api.py` (1533 lines) into modular package structure:
+- `maico_ws/registers.py` - Register constants
+- `maico_ws/client.py` - Modbus connection logic
+- `maico_ws/sensors.py` - Sensor reading methods
+- `maico_ws/controls.py` - Control/write methods
+- `maico_ws/status.py` - Status aggregation
+
+### Translations
+- Added German, French, and English translations for all new entities.
+
+---
+
 # Release v1.3.0: Stability & Compatibility
 
 This release focuses on **stability fixes** and **improved compatibility** with Home Assistant 2025.11+.

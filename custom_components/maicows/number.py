@@ -32,6 +32,38 @@ async def async_setup_entry(
     entities = [
         MaicoWS320BSupplyTempMinCoolNumber(coordinator),
         MaicoWS320BMaxRoomTempNumber(coordinator),
+        # External temperature inputs
+        MaicoExternalTempNumber(
+            coordinator,
+            "room_temp_external",
+            MaicoWSRegisters.ROOM_TEMP_EXT,
+            icon="mdi:home-thermometer",
+        ),
+        MaicoExternalTempNumber(
+            coordinator,
+            "room_temp_bus",
+            MaicoWSRegisters.ROOM_TEMP_BUS,
+            icon="mdi:bus",
+        ),
+        # External humidity and air quality inputs
+        MaicoBusSensorNumber(
+            coordinator,
+            "humidity_bus",
+            MaicoWSRegisters.HUMIDITY_BUS,
+            min_val=0,
+            max_val=100,
+            unit="%",
+            icon="mdi:water-percent",
+        ),
+        MaicoBusSensorNumber(
+            coordinator,
+            "air_quality_bus",
+            MaicoWSRegisters.AIR_QUALITY_BUS,
+            min_val=0,
+            max_val=5000,
+            unit="ppm",
+            icon="mdi:molecule-co2",
+        ),
         # Filter settings
         MaicoWS320BConfigNumber(
             coordinator,
@@ -199,9 +231,94 @@ class MaicoWS320BConfigNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity)
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
-        success = await self.coordinator.api.write_register_value(
-            self._register, int(value)
-        )
+        success = await self.coordinator.api.write_register(self._register, int(value))
+        if success:
+            await self.coordinator.async_request_refresh()
+        else:
+            _LOGGER.error("Failed to set %s to %f", self._key, value)
+
+
+class MaicoExternalTempNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity):
+    """Number entity for external temperature input (writeable)."""
+
+    _attr_has_entity_name = True
+    _attr_mode = NumberMode.BOX
+
+    def __init__(
+        self,
+        coordinator: MaicoCoordinator,
+        key: str,
+        register: int,
+        icon: str | None = None,
+    ) -> None:
+        """Initialize the number."""
+        super().__init__(coordinator)
+        self._key = key
+        self._register = register
+        self._attr_translation_key = key
+        self._attr_unique_id = f"{coordinator.api.host}_{coordinator.api.port}_{key}"
+        self._attr_device_info = coordinator.device_info
+        self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+        self._attr_native_min_value = -20.0
+        self._attr_native_max_value = 50.0
+        self._attr_native_step = 0.5
+        if icon:
+            self._attr_icon = icon
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the current value."""
+        return self.coordinator.data.get(self._key)
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Update the current value."""
+        # Temperature values are stored as °C * 10
+        raw_value = int(value * 10)
+        success = await self.coordinator.api.write_register(self._register, raw_value)
+        if success:
+            await self.coordinator.async_request_refresh()
+        else:
+            _LOGGER.error("Failed to set %s to %f", self._key, value)
+
+
+class MaicoBusSensorNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity):
+    """Number entity for bus sensor input (humidity, air quality)."""
+
+    _attr_has_entity_name = True
+    _attr_mode = NumberMode.BOX
+
+    def __init__(  # noqa: PLR0913
+        self,
+        coordinator: MaicoCoordinator,
+        key: str,
+        register: int,
+        min_val: float,
+        max_val: float,
+        unit: str,
+        icon: str | None = None,
+    ) -> None:
+        """Initialize the number."""
+        super().__init__(coordinator)
+        self._key = key
+        self._register = register
+        self._attr_translation_key = key
+        self._attr_unique_id = f"{coordinator.api.host}_{coordinator.api.port}_{key}"
+        self._attr_device_info = coordinator.device_info
+        self._attr_native_unit_of_measurement = unit
+        self._attr_native_min_value = min_val
+        self._attr_native_max_value = max_val
+        self._attr_native_step = 1.0
+        if icon:
+            self._attr_icon = icon
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the current value."""
+        return self.coordinator.data.get(self._key)
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Update the current value."""
+        success = await self.coordinator.api.write_register(self._register, int(value))
         if success:
             await self.coordinator.async_request_refresh()
         else:

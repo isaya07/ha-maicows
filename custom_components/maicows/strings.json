@@ -59,6 +59,15 @@
           "winter": "Winter",
           "summer": "Summer"
         }
+      },
+      "room_temp_selection": {
+        "name": "Room Temperature Sensor",
+        "state": {
+          "comfort_bde": "Comfort BDE",
+          "external": "External",
+          "internal": "Internal",
+          "bus": "Bus"
+        }
       }
     },
     "sensor": {
@@ -247,6 +256,18 @@
       },
       "room_temp_max": {
         "name": "Max Room Temperature"
+      },
+      "room_temp_external": {
+        "name": "External Room Temperature"
+      },
+      "room_temp_bus": {
+        "name": "Bus Room Temperature"
+      },
+      "humidity_bus": {
+        "name": "Bus Humidity"
+      },
+      "air_quality_bus": {
+        "name": "Bus Air Quality (CO2)"
       },
       "filter_device_months": {
         "name": "Device Filter Duration"

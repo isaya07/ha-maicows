@@ -11,12 +11,25 @@ This integration communicates with Maico ventilation units via Modbus TCP (or po
 
 ## Features
 
-- **Fan**: Control ventilation speed/levels.
-- **Climate**: Control core climate parameters (if supported).
-- **Sensors**: Read various statuses from the device (temperatures, air quality, etc.).
-- **Switches**: Toggle specific functions.
-- **Select**: Choose operation modes.
-- **Number**: Adjust numeric parameters.
+- **Fan**: Control ventilation speed/levels (0-4).
+- **Climate**: Control core climate parameters with temperature setpoint.
+- **Sensors**: Read various statuses (temperatures, humidity, CO2, VOC, fan speeds, filter status).
+- **Switches**: Toggle functions (power, boost, filter reset).
+- **Select**: Choose operation modes, season, and room temperature sensor source.
+- **Number**: Adjust numeric parameters (temperature limits, filter duration, volume flows).
+
+### External Sensor Support
+
+The integration supports writing external sensor values to the VMC via Modbus:
+
+| Entity | Register | Description |
+|--------|----------|-------------|
+| `number.room_temp_external` | 701 | External room temperature (°C) |
+| `number.room_temp_bus` | 707 | Bus room temperature (°C) |
+| `number.humidity_bus` | 763 | Bus humidity (% RH) |
+| `number.air_quality_bus` | 764 | Bus air quality/CO2 (ppm) |
+
+Use `select.room_temp_selection` to choose which temperature source the VMC uses.
 
 ## Installation
 

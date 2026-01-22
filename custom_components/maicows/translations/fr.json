@@ -59,6 +59,15 @@
           "winter": "Hiver",
           "summer": "Été"
         }
+      },
+      "room_temp_selection": {
+        "name": "Capteur température ambiante",
+        "state": {
+          "comfort_bde": "Confort BDE",
+          "external": "Externe",
+          "internal": "Interne",
+          "bus": "Bus"
+        }
       }
     },
     "sensor": {
@@ -247,6 +256,18 @@
       },
       "room_temp_max": {
         "name": "Température max. ambiante"
+      },
+      "room_temp_external": {
+        "name": "Température ambiante externe"
+      },
+      "room_temp_bus": {
+        "name": "Température ambiante bus"
+      },
+      "humidity_bus": {
+        "name": "Humidité bus"
+      },
+      "air_quality_bus": {
+        "name": "Qualité d'air bus (CO2)"
       },
       "filter_device_months": {
         "name": "Durée filtre appareil (Mois)"

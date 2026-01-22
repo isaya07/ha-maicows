@@ -16,10 +16,10 @@ def mock_pymodbus_clients():
     """Mock pymodbus clients to prevent socket usage."""
     with (
         patch(
-            "custom_components.maicows.maico_ws_api.AsyncModbusTcpClient"
+            "custom_components.maicows.maico_ws.client.AsyncModbusTcpClient"
         ) as mock_tcp,
         patch(
-            "custom_components.maicows.maico_ws_api.AsyncModbusSerialClient"
+            "custom_components.maicows.maico_ws.client.AsyncModbusSerialClient"
         ) as mock_serial,
     ):
         # Configure TCP client
@@ -46,7 +46,7 @@ def mock_pymodbus_clients():
 
         tcp_client.write_register.side_effect = mock_tcp_write
 
-        # Configure Serial client similarly (optional but good for safety)
+        # Configure Serial client similarly
         serial_client = mock_serial.return_value
         serial_client.connect.side_effect = mock_tcp_connect
 
@@ -67,9 +67,10 @@ def mock_maico_ws_client():
     """Mock MaicoWS client."""
     with (
         patch(
-            "custom_components.maicows.maico_ws_api.MaicoWS", autospec=True
+            "custom_components.maicows.maico_ws.MaicoWS", autospec=True
         ) as mock_client,
         patch("custom_components.maicows.config_flow.MaicoWS", new=mock_client),
+        patch("custom_components.maicows.maico_ws_api.MaicoWS", new=mock_client),
     ):
         client = mock_client.return_value
         client.host = "1.2.3.4"

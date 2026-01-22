@@ -55,7 +55,7 @@ async def test_setup_entry_exception(hass: HomeAssistant, mock_maico_ws_client):
         return False
 
     with patch(
-        "custom_components.maicows.maico_ws_api.AsyncModbusTcpClient"
+        "custom_components.maicows.maico_ws.client.AsyncModbusTcpClient"
     ) as mock_tcp_fail:
         mock_tcp_fail.return_value.connect.side_effect = mock_connect_fail
 

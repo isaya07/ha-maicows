@@ -59,6 +59,15 @@
           "winter": "Winter",
           "summer": "Sommer"
         }
+      },
+      "room_temp_selection": {
+        "name": "Raumtemperaturfühler",
+        "state": {
+          "comfort_bde": "Comfort BDE",
+          "external": "Extern",
+          "internal": "Intern",
+          "bus": "Bus"
+        }
       }
     },
     "sensor": {
@@ -247,6 +256,18 @@
       },
       "room_temp_max": {
         "name": "Max. Raumtemperatur"
+      },
+      "room_temp_external": {
+        "name": "Externe Raumtemperatur"
+      },
+      "room_temp_bus": {
+        "name": "Bus Raumtemperatur"
+      },
+      "humidity_bus": {
+        "name": "Bus Feuchtigkeit"
+      },
+      "air_quality_bus": {
+        "name": "Bus Luftqualität (CO2)"
       },
       "filter_device_months": {
         "name": "Filterstandzeit Gerät (Monate)"
