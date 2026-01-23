@@ -1,3 +1,16 @@
+# Release v1.4.2: Hotfix
+
+## 🐛 Bug Fixes
+
+### Sensor Platform Crash
+- **Fixed:** KeyError when loading sensor platform due to missing `device_class` on VOC sensors. Changed to use `.get()` for optional fields.
+
+### Write Operations Consistency
+- **Fixed:** Added `self._api` reference to `MaicoExternalTempNumber` and `MaicoBusSensorNumber` for consistency with other working entities.
+- **Added:** Debug logging for all bus sensor write operations to help troubleshoot issues.
+
+---
+
 # Release v1.4.1: Bug Fixes
 
 This release fixes critical bugs discovered after the v1.4.0 refactoring.

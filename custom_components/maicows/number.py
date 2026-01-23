@@ -291,10 +291,11 @@ class MaicoExternalTempNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity)
     ) -> None:
         """Initialize the number."""
         super().__init__(coordinator)
+        self._api = coordinator.api
         self._key = key
         self._register = register
         self._attr_translation_key = key
-        self._attr_unique_id = f"{coordinator.api.host}_{coordinator.api.port}_{key}"
+        self._attr_unique_id = f"{self._api.host}_{self._api.port}_{key}"
         self._attr_device_info = coordinator.device_info
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_native_min_value = -20.0
@@ -312,7 +313,14 @@ class MaicoExternalTempNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity)
         """Update the current value."""
         # Temperature values are stored as °C * 10
         raw_value = int(value * 10)
-        success = await self.coordinator.api.write_register(self._register, raw_value)
+        _LOGGER.debug(
+            "Writing %s: value=%.1f°C, raw=%d, register=%d",
+            self._key,
+            value,
+            raw_value,
+            self._register,
+        )
+        success = await self._api.write_register(self._register, raw_value)
         if success:
             await self.coordinator.async_request_refresh()
         else:
@@ -337,10 +345,11 @@ class MaicoBusSensorNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity):
     ) -> None:
         """Initialize the number."""
         super().__init__(coordinator)
+        self._api = coordinator.api
         self._key = key
         self._register = register
         self._attr_translation_key = key
-        self._attr_unique_id = f"{coordinator.api.host}_{coordinator.api.port}_{key}"
+        self._attr_unique_id = f"{self._api.host}_{self._api.port}_{key}"
         self._attr_device_info = coordinator.device_info
         self._attr_native_unit_of_measurement = unit
         self._attr_native_min_value = min_val
@@ -356,7 +365,11 @@ class MaicoBusSensorNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity):
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current value."""
-        success = await self.coordinator.api.write_register(self._register, int(value))
+        raw_value = int(value)
+        _LOGGER.debug(
+            "Writing %s: value=%d, register=%d", self._key, raw_value, self._register
+        )
+        success = await self._api.write_register(self._register, raw_value)
         if success:
             await self.coordinator.async_request_refresh()
         else:

@@ -356,9 +356,9 @@ async def async_setup_entry(
         MaicoWS320BSensor(
             coordinator=coordinator,
             key=sensor_type["key"],
-            device_class=sensor_type["device_class"],
+            device_class=sensor_type.get("device_class"),
             state_class=sensor_type.get("state_class"),
-            unit_of_measurement=sensor_type["unit_of_measurement"],
+            unit_of_measurement=sensor_type.get("unit_of_measurement"),
             attr_name=sensor_type["attr_name"],
             icon=sensor_type.get("icon"),
         )
