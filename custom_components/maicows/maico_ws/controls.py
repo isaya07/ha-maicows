@@ -30,8 +30,7 @@ class ControlsMixin:
     _connected: bool
     _slave_id: int
 
-    async def write_register(self, register: int, value: int) -> bool:
-        """Write a value to a register (from base class)."""
+    # Note: write_register is inherited from MaicoWSClient base class
 
     async def set_operation_mode(self, mode: int) -> bool:
         """Set operation mode (0-5)."""
@@ -66,6 +65,22 @@ class ControlsMixin:
         raw_value = int(round(temp * 2) / 2 * 10)
         _LOGGER.debug("Setting target room temperature to: %.1f°C", temp)
         return await self.write_register(MaicoWSRegisters.TARGET_ROOM_TEMP, raw_value)
+
+    async def write_supply_temp_min_cool(self, temp: float) -> bool:
+        """Write minimum supply air temperature for cooling (register 301)."""
+        # Register 301 stores integer values (8-29°C)
+        raw_value = int(temp)
+        _LOGGER.debug("Writing supply temp min cool: %d°C", raw_value)
+        return await self.write_register(
+            MaicoWSRegisters.SUPPLY_TEMP_MIN_COOL, raw_value
+        )
+
+    async def write_room_temp_max(self, temp: float) -> bool:
+        """Write maximum room temperature (register 302)."""
+        # Register 302 stores values in 0.1°C increments
+        raw_value = int(temp * 10)
+        _LOGGER.debug("Writing room temp max: %.1f°C", temp)
+        return await self.write_register(MaicoWSRegisters.ROOM_TEMP_MAX, raw_value)
 
     async def set_season(self, season: int) -> bool:
         """Set season (0=Winter, 1=Summer)."""

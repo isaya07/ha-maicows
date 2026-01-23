@@ -32,6 +32,7 @@ async def async_setup_entry(
     entities = [
         MaicoWS320BSupplyTempMinCoolNumber(coordinator),
         MaicoWS320BMaxRoomTempNumber(coordinator),
+        MaicoRoomTempAdjustNumber(coordinator),
         # External temperature inputs
         MaicoExternalTempNumber(
             coordinator,
@@ -43,7 +44,7 @@ async def async_setup_entry(
             coordinator,
             "room_temp_bus",
             MaicoWSRegisters.ROOM_TEMP_BUS,
-            icon="mdi:bus",
+            icon="mdi:thermometer-lines",
         ),
         # External humidity and air quality inputs
         MaicoBusSensorNumber(
@@ -191,6 +192,43 @@ class MaicoWS320BMaxRoomTempNumber(CoordinatorEntity[MaicoCoordinator], NumberEn
             await self.coordinator.async_request_refresh()
         else:
             _LOGGER.error("Failed to set max room temperature to %f", value)
+
+
+class MaicoRoomTempAdjustNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity):
+    """Representation of Maico WS room temperature adjustment (register 300)."""
+
+    _attr_has_entity_name = True
+    _attr_translation_key = "room_temp_adjust"
+
+    def __init__(self, coordinator: MaicoCoordinator) -> None:
+        """Initialize the number."""
+        super().__init__(coordinator)
+        self._api = coordinator.api
+        self._attr_unique_id = f"{self._api.host}_{self._api.port}_room_temp_adjust"
+        self._attr_device_info = coordinator.device_info
+        self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+        self._attr_native_min_value = -3.0  # From documentation: -3°C
+        self._attr_native_max_value = 3.0  # From documentation: +3°C
+        self._attr_native_step = 0.5
+        self._attr_mode = NumberMode.BOX
+        self._attr_icon = "mdi:thermometer-plus"
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the current value."""
+        return self.coordinator.data.get("room_temp_adjust")
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Update the current value."""
+        # Register 300 stores values in 0.1°C increments
+        raw_value = int(value * 10)
+        success = await self._api.write_register(
+            MaicoWSRegisters.ROOM_TEMP_ADJUST, raw_value
+        )
+        if success:
+            await self.coordinator.async_request_refresh()
+        else:
+            _LOGGER.error("Failed to set room temp adjust to %f", value)
 
 
 class MaicoWS320BConfigNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity):

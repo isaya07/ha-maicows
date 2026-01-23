@@ -257,6 +257,9 @@
       "room_temp_max": {
         "name": "Température max. ambiante"
       },
+      "room_temp_adjust": {
+        "name": "Correction température ambiante"
+      },
       "room_temp_external": {
         "name": "Température ambiante externe"
       },

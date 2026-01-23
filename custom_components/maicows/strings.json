@@ -257,6 +257,9 @@
       "room_temp_max": {
         "name": "Max Room Temperature"
       },
+      "room_temp_adjust": {
+        "name": "Room Temperature Adjustment"
+      },
       "room_temp_external": {
         "name": "External Room Temperature"
       },

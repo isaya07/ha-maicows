@@ -315,7 +315,6 @@ SENSOR_TYPES = [
     },
     {
         "key": "voc_sensor_1",
-        "device_class": SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
         "attr_name": "voc_sensor_1",
@@ -323,7 +322,6 @@ SENSOR_TYPES = [
     },
     {
         "key": "voc_sensor_2",
-        "device_class": SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
         "attr_name": "voc_sensor_2",
@@ -331,7 +329,6 @@ SENSOR_TYPES = [
     },
     {
         "key": "voc_sensor_3",
-        "device_class": SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
         "attr_name": "voc_sensor_3",
@@ -339,7 +336,6 @@ SENSOR_TYPES = [
     },
     {
         "key": "voc_sensor_4",
-        "device_class": SensorDeviceClass.VOLATILE_ORGANIC_COMPOUNDS,
         "state_class": SensorStateClass.MEASUREMENT,
         "unit_of_measurement": CONCENTRATION_PARTS_PER_MILLION,
         "attr_name": "voc_sensor_4",

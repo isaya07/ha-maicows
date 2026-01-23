@@ -1,3 +1,28 @@
+# Release v1.4.1: Bug Fixes
+
+This release fixes critical bugs discovered after the v1.4.0 refactoring.
+
+## 🐛 Bug Fixes
+
+### Write Operations Not Working
+- **Fixed:** Number entities were not sending values to the VMC due to an empty `write_register` stub method in `ControlsMixin` that was shadowing the real implementation in `MaicoWSClient`.
+
+### Missing Write Methods
+- **Fixed:** Added missing methods `write_supply_temp_min_cool()` and `write_room_temp_max()` that were not migrated during refactoring.
+
+### VOC Sensor Warning
+- **Fixed:** Removed incompatible `device_class: VOLATILE_ORGANIC_COMPOUNDS` from VOC sensors. The ppm unit is not compatible with this device class (requires μg/m³).
+
+## 🚀 New Entity
+
+### Room Temperature Adjustment
+- **New:** `number.room_temp_adjust` (register 300) - Correction température ambiante (-3°C to +3°C)
+
+## 🎨 UI Improvements
+- Changed `room_temp_bus` icon from bus vehicle to thermometer (`mdi:thermometer-lines`)
+
+---
+
 # Release v1.4.0: Refactoring & External Sensors
 
 This release brings a **major code refactoring** and **external sensor support**, enabling integration with external temperature, humidity, and air quality sensors via Modbus.
