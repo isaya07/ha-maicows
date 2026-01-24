@@ -57,7 +57,10 @@ class ControlsMixin:
         """Set target room temperature (18.0-25.0°C)."""
         if temp < TARGET_TEMP_MIN or temp > TARGET_TEMP_MAX:
             _LOGGER.error(
-                "Invalid target temperature: %.1f. Must be 18.0-25.0°C.", temp
+                "Invalid target temperature: %.1f. Must be %.1f-%.1f°C.",
+                temp,
+                TARGET_TEMP_MIN,
+                TARGET_TEMP_MAX,
             )
             return False
 

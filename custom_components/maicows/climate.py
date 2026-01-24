@@ -79,8 +79,8 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
         )
         self._attr_hvac_modes = SUPPORTED_HVAC_MODES
         self._attr_fan_modes = FAN_MODES
-        self._attr_min_temp = 10  # Minimum temperature in Celsius
-        self._attr_max_temp = 30  # Maximum temperature in Celsius
+        self._attr_min_temp = 18  # Minimum temperature in Celsius (Maico limit)
+        self._attr_max_temp = 25  # Maximum temperature in Celsius (Maico limit)
         self._attr_target_temperature_step = 0.5
 
     @property

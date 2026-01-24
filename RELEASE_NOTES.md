@@ -19,6 +19,9 @@ Fixed 15 method calls that were using old/non-existent method names after the v1
 ### Temperature Precision
 - **Fixed:** Bus temperature Number entities now use 0.1°C step instead of 0.5°C for better precision.
 
+### Climate Temperature Limits
+- **Fixed:** Climate entity now enforces Maico VMC limits (18-25°C) in the UI slider to prevent invalid temperature errors.
+
 ---
 
 # Release v1.4.2: Hotfix
