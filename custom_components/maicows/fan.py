@@ -122,13 +122,13 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
 
         # Ensure the device is turned on when setting a level
         if level != 0 and not self.is_on:  # Only turn on if not setting to "off"
-            power_success = await self._api.write_power_state(state=True)
+            power_success = await self._api.set_operation_mode(1)
             if not power_success:
                 _LOGGER.error("Failed to turn on device before setting fan level")
                 return
 
         # Set the fan level
-        level_success = await self._api.write_ventilation_level(level)
+        level_success = await self._api.set_ventilation_level(level)
 
         if level_success:
             await self.coordinator.async_request_refresh()
@@ -139,7 +139,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         """Set the speed percentage."""
         if percentage == 0:
             # Turn off the fan (level 0)
-            success = await self._api.write_ventilation_level(0)
+            success = await self._api.set_ventilation_level(0)
             if success:
                 await self.coordinator.async_request_refresh()
             else:
@@ -147,7 +147,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
         else:
             # Turn on the device if it's off
             if not self.is_on:
-                power_success = await self._api.write_power_state(state=True)
+                power_success = await self._api.set_operation_mode(1)
                 if not power_success:
                     _LOGGER.error("Failed to turn on device before setting speed")
                     return
@@ -158,7 +158,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
             level = max(1, min(4, level))
 
             # Set the ventilation level
-            level_success = await self._api.write_ventilation_level(level)
+            level_success = await self._api.set_ventilation_level(level)
 
             if level_success:
                 await self.coordinator.async_request_refresh()
@@ -173,7 +173,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
     ) -> None:
         """Turn on the fan."""
         # Turn on the device
-        power_success = await self._api.write_power_state(state=True)
+        power_success = await self._api.set_operation_mode(1)
         if not power_success:
             _LOGGER.error("Failed to turn on the device")
             return
@@ -188,7 +188,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
             # and currently off
             current_level = self.coordinator.data.get("current_ventilation_level", 0)
             if current_level == 0:
-                level_success = await self._api.write_ventilation_level(2)
+                level_success = await self._api.set_ventilation_level(2)
                 if level_success:
                     await self.coordinator.async_request_refresh()
             else:
@@ -196,7 +196,7 @@ class MaicoWS320BFan(CoordinatorEntity[MaicoCoordinator], FanEntity):
 
     async def async_turn_off(self, **kwargs: Any) -> None:  # noqa: ARG002
         """Turn off the fan."""
-        success = await self._api.write_power_state(state=False)
+        success = await self._api.set_operation_mode(0)
         if success:
             await self.coordinator.async_request_refresh()
         else:

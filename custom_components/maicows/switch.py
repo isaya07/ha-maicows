@@ -66,7 +66,7 @@ class MaicoWS320BPowerSwitch(CoordinatorEntity[MaicoCoordinator], SwitchEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:  # noqa: ARG002
         """Turn on the VMC."""
-        success = await self._api.write_power_state(state=True)
+        success = await self._api.set_operation_mode(1)
         if success:
             await self.coordinator.async_request_refresh()
         else:
@@ -74,7 +74,7 @@ class MaicoWS320BPowerSwitch(CoordinatorEntity[MaicoCoordinator], SwitchEntity):
 
     async def async_turn_off(self, **kwargs: Any) -> None:  # noqa: ARG002
         """Turn off the VMC."""
-        success = await self._api.write_power_state(state=False)
+        success = await self._api.set_operation_mode(0)
         if success:
             await self.coordinator.async_request_refresh()
         else:
@@ -107,11 +107,11 @@ class MaicoWS320BFilterChangeSwitch(CoordinatorEntity[MaicoCoordinator], SwitchE
         """Handle the switch press - mark the filter as changed."""
         success = False
         if self._filter_type == "device":
-            success = await self._api.write_filter_change_device(changed=True)
+            success = await self._api.reset_filter_device()
         elif self._filter_type == "outdoor":
-            success = await self._api.write_filter_change_outdoor(changed=True)
+            success = await self._api.reset_filter_outdoor()
         elif self._filter_type == "room":
-            success = await self._api.write_filter_change_room(changed=True)
+            success = await self._api.reset_filter_room()
 
         if success:
             _LOGGER.info("Successfully marked %s filter as changed", self._filter_type)
@@ -147,7 +147,7 @@ class MaicoWS320BBoostSwitch(CoordinatorEntity[MaicoCoordinator], SwitchEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:  # noqa: ARG002
         """Turn the switch on."""
-        success = await self.coordinator.api.write_boost_ventilation(state=True)
+        success = await self.coordinator.api.set_boost_ventilation(active=True)
         if success:
             await self.coordinator.async_request_refresh()
         else:
@@ -155,7 +155,7 @@ class MaicoWS320BBoostSwitch(CoordinatorEntity[MaicoCoordinator], SwitchEntity):
 
     async def async_turn_off(self, **kwargs: Any) -> None:  # noqa: ARG002
         """Turn the switch off."""
-        success = await self.coordinator.api.write_boost_ventilation(state=False)
+        success = await self.coordinator.api.set_boost_ventilation(active=False)
         if success:
             await self.coordinator.async_request_refresh()
         else:

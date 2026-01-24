@@ -1,3 +1,26 @@
+# Release v1.4.3: API Method Fixes
+
+## 🐛 Bug Fixes
+
+### Missing API Methods
+Fixed 15 method calls that were using old/non-existent method names after the v1.4.0 refactoring:
+
+- **switch.py**: `write_power_state` → `set_operation_mode` (2 calls)
+- **switch.py**: `write_filter_change_*` → `reset_filter_*` (3 calls)
+- **switch.py**: `write_boost_ventilation` → `set_boost_ventilation` (2 calls)
+- **fan.py**: `write_power_state` → `set_operation_mode` (4 calls)
+- **climate.py**: `write_operation_mode` → `set_operation_mode` (2 calls)
+- **climate.py**: `write_supply_air_temperature` → `set_target_room_temperature` (1 call)
+- **button.py**: `trigger_error_reset` → `reset_error` (1 call)
+
+### Climate Temperature Source
+- **Fixed:** Climate entity now uses `room_temperature` instead of `supply_air_temperature` for current temperature display.
+
+### Temperature Precision
+- **Fixed:** Bus temperature Number entities now use 0.1°C step instead of 0.5°C for better precision.
+
+---
+
 # Release v1.4.2: Hotfix
 
 ## 🐛 Bug Fixes

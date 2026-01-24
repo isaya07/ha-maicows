@@ -300,7 +300,7 @@ class MaicoExternalTempNumber(CoordinatorEntity[MaicoCoordinator], NumberEntity)
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_native_min_value = -20.0
         self._attr_native_max_value = 50.0
-        self._attr_native_step = 0.5
+        self._attr_native_step = 0.1
         if icon:
             self._attr_icon = icon
 

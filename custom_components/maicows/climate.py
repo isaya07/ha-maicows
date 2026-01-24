@@ -86,7 +86,7 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
     @property
     def current_temperature(self) -> float | None:
         """Return the current temperature."""
-        return self.coordinator.data.get("supply_air_temperature")
+        return self.coordinator.data.get("room_temperature")
 
     @property
     def target_temperature(self) -> float | None:
@@ -116,10 +116,10 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
 
         if hvac_mode == HVACMode.OFF:
             # Turn off VMC by setting operation mode to 0 (Off)
-            success = await self._api.write_operation_mode(0)
+            success = await self._api.set_operation_mode(0)
         elif hvac_mode == HVACMode.FAN_ONLY:
             # Turn on VMC by setting operation mode to 1 (Manual)
-            success = await self._api.write_operation_mode(1)
+            success = await self._api.set_operation_mode(1)
         else:
             _LOGGER.error("Invalid HVAC mode: %s", hvac_mode)
             return
@@ -138,7 +138,7 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
         # Map standard HA fan mode to VMC ventilation level
         level = FAN_MODE_TO_VENTILATION.get(fan_mode, 3)
 
-        success = await self._api.write_ventilation_level(level)
+        success = await self._api.set_ventilation_level(level)
 
         if success:
             await self.coordinator.async_request_refresh()
@@ -159,10 +159,8 @@ class MaicoWS320BClimate(CoordinatorEntity[MaicoCoordinator], ClimateEntity):
                 )
                 raise HomeAssistantError(msg)
 
-            # Note: API method name 'write_supply_air_temperature' writes to
-            # TARGET_ROOM_TEMP (553) which is what we want for target temperature
-            # setting.
-            success = await self._api.write_supply_air_temperature(temperature)
+            # Set target room temperature using register 553
+            success = await self._api.set_target_room_temperature(temperature)
 
             if success:
                 await self.coordinator.async_request_refresh()

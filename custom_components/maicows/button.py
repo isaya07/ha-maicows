@@ -52,7 +52,7 @@ class MaicoWS320BErrorResetButton(CoordinatorEntity[MaicoCoordinator], ButtonEnt
 
     async def async_press(self) -> None:
         """Handle the button press."""
-        success = await self._api.trigger_error_reset()
+        success = await self._api.reset_error()
         if success:
             _LOGGER.info("Error reset triggered successfully")
             # Refresh coordinator data to clear error status
