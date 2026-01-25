@@ -1,0 +1,33 @@
+{
+    "name": "ha-maicows-card",
+    "version": "1.0.0",
+    "description": "Custom Lovelace card for Maico WS VMC integration",
+    "main": "dist/maico-vmc-card.js",
+    "scripts": {
+        "build": "rollup -c",
+        "watch": "rollup -c -w",
+        "lint": "eslint src/",
+        "prepare": "npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/isaya07/ha-maicows-card"
+    },
+    "keywords": [
+        "home-assistant",
+        "lovelace",
+        "maico",
+        "vmc",
+        "custom-card"
+    ],
+    "author": "isaya07",
+    "license": "MIT",
+    "devDependencies": {
+        "@rollup/plugin-node-resolve": "^15.2.3",
+        "@rollup/plugin-terser": "^0.4.4",
+        "rollup": "^4.9.0"
+    },
+    "files": [
+        "dist/maico-vmc-card.js"
+    ]
+}

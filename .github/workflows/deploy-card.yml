@@ -1,0 +1,45 @@
+name: Deploy Card to Distribution Repo
+
+on:
+  push:
+    paths:
+      - 'ha-maicows-card/**'
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install and Build
+        working-directory: ha-maicows-card
+        run: |
+          npm ci
+          npm run build
+
+      - name: Prepare Release Directory
+        run: |
+          mkdir -p deploy/dist
+          cp ha-maicows-card/dist/maico-vmc-card.js deploy/dist/
+          cp ha-maicows-card/hacs.json deploy/
+          cp ha-maicows-card/README.md deploy/
+
+      - name: Push to Distribution Repo
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: 'deploy'
+          destination-github-username: 'isaya07'
+          destination-repository-name: 'ha-maicows-card'
+          user-email: 'actions@github.com'
+          target-branch: 'main'
