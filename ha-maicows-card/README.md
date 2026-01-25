@@ -31,13 +31,13 @@ Carte Lovelace personnalisée pour l'intégration [Maico WS VMC](https://github.
 
 ### Manuel
 
-1. Télécharger `maico-vmc-card.js` depuis les [releases](https://github.com/isaya07/ha-maicows-card/releases)
+1. Télécharger `ha-maicows-card.js` depuis les [releases](https://github.com/isaya07/ha-maicows-card/releases)
 2. Copier dans `/config/www/`
 3. Ajouter la ressource dans Lovelace:
 
 ```yaml
 resources:
-  - url: /local/maico-vmc-card.js
+  - url: /local/ha-maicows-card.js
     type: module
 ```
 

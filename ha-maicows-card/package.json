@@ -2,7 +2,7 @@
     "name": "ha-maicows-card",
     "version": "1.0.0",
     "description": "Custom Lovelace card for Maico WS VMC integration",
-    "main": "dist/maico-vmc-card.js",
+    "main": "dist/ha-maicows-card.js",
     "scripts": {
         "build": "rollup -c",
         "watch": "rollup -c -w",
@@ -28,6 +28,6 @@
         "rollup": "^4.9.0"
     },
     "files": [
-        "dist/maico-vmc-card.js"
+        "dist/ha-maicows-card.js"
     ]
 }

@@ -1,6 +1,6 @@
 {
     "name": "Maico VMC Card",
     "content_in_root": false,
-    "filename": "maico-vmc-card.js",
+    "filename": "ha-maicows-card.js",
     "render_readme": true
 }
