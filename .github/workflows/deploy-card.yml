@@ -29,9 +29,12 @@ jobs:
       - name: Prepare Release Directory
         run: |
           mkdir -p deploy/dist
+          mkdir -p deploy/docs
           cp ha-maicows-card/dist/maico-vmc-card.js deploy/dist/
           cp ha-maicows-card/hacs.json deploy/
           cp ha-maicows-card/README.md deploy/
+          cp ha-maicows-card/docs/preview.png deploy/docs/
+          cp ha-maicows-card/LICENSE deploy/
 
       - name: Push to Distribution Repo
         uses: cpina/github-action-push-to-another-repository@main
