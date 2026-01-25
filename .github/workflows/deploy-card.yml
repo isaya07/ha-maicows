@@ -23,7 +23,7 @@ jobs:
       - name: Install and Build
         working-directory: ha-maicows-card
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Prepare Release Directory
