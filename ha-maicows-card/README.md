@@ -27,7 +27,7 @@ Carte Lovelace personnalisée pour l'intégration [Maico WS VMC](https://github.
 5. Installer "Maico VMC Card"
 6. Redémarrer Home Assistant
 
-[![Ouvre votre instance Home Assistant et ajoute un dépôt dans la boutique communautaire Home Assistant.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=isaya07&repository=ha-maicows-card&category=lovelace)
+[![Ouvre votre instance Home Assistant et ajoutez le dépôt dans la boutique communautaire Home Assistant.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=isaya07&repository=ha-maicows-card&category=lovelace)
 
 ### Manuel
 

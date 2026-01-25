@@ -46,3 +46,26 @@ jobs:
           destination-repository-name: 'ha-maicows-card'
           user-email: 'actions@github.com'
           target-branch: 'main'
+
+      - name: Create Release on Distribution Repo
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
+        run: |
+          VERSION=$(node -p "require('./ha-maicows-card/package.json').version")
+          TARGET_REPO="isaya07/ha-maicows-card"
+          
+          echo "Processing version v$VERSION for repo $TARGET_REPO"
+          
+          # Check if release exists
+          if gh release view "v$VERSION" -R "$TARGET_REPO" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists. Skipping."
+          else
+            echo "Creating release v$VERSION..."
+            gh release create "v$VERSION" \
+              deploy/dist/ha-maicows-card.js \
+              -R "$TARGET_REPO" \
+              -t "v$VERSION" \
+              -n "Release auto-générée depuis le dépôt principal." \
+              --target main
+          fi
