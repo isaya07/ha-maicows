@@ -48,6 +48,9 @@ const TRANSLATIONS = {
     mode_low: "Reduced",
     mode_medium: "Normal",
     mode_high: "Intensive",
+    power: "Power",
+    ventilation: "Ventilation",
+    boost: "Boost",
   },
   fr: {
     efficiency: "Rendement",
@@ -65,6 +68,9 @@ const TRANSLATIONS = {
     mode_low: "Réduit",
     mode_medium: "Normal",
     mode_high: "Intensif",
+    power: "Alimentation",
+    ventilation: "Ventilation",
+    boost: "Surventilation",
   },
   de: {
     efficiency: "Wirkungsgrad",
@@ -82,6 +88,9 @@ const TRANSLATIONS = {
     mode_low: "Reduziert",
     mode_medium: "Normal",
     mode_high: "Intensiv",
+    power: "Stromversorgung",
+    ventilation: "Lüftung",
+    boost: "Stoßlüftung",
   }
 };
 
@@ -92,6 +101,7 @@ class MaicoVMCCard extends LitElement {
       config: { type: Object },
       _entities: { type: Object },
       _history: { type: Array },
+      _drawerOpen: { type: Boolean },
     };
   }
 
@@ -104,6 +114,7 @@ class MaicoVMCCard extends LitElement {
     super();
     this._history = [];
     this._historyInterval = null;
+    this._drawerOpen = false;
   }
 
   static getConfigElement() {
@@ -295,6 +306,16 @@ class MaicoVMCCard extends LitElement {
         (e.includes("days") || e.includes("jours") || e.includes("restant") || e.includes("verbleibend"))
     );
 
+    // Find power switch
+    entities.power_switch = allEntities.find(
+      (e) => e.startsWith("switch.maico") && (e.includes("power") || e.includes("alimentation") || e.includes("stromversorgung"))
+    );
+
+    // Find boost switch
+    entities.boost_switch = allEntities.find(
+      (e) => e.startsWith("switch.maico") && (e.includes("boost") || e.includes("surventilation"))
+    );
+
     return entities;
   }
 
@@ -379,6 +400,31 @@ class MaicoVMCCard extends LitElement {
       detail: { entityId: entities.climate || entities.fan },
     });
     this.dispatchEvent(event);
+  }
+
+  _toggleDrawer() {
+    this._drawerOpen = !this._drawerOpen;
+  }
+
+  _handlePower() {
+    const entities = this._discoverEntities();
+    if (entities.power_switch) {
+      this.hass.callService("switch", "toggle", { entity_id: entities.power_switch });
+    }
+  }
+
+  _handleVentilation() {
+    const entities = this._discoverEntities();
+    if (entities.fan) {
+      this.hass.callService("fan", "toggle", { entity_id: entities.fan });
+    }
+  }
+
+  _handleBoost() {
+    const entities = this._discoverEntities();
+    if (entities.boost_switch) {
+      this.hass.callService("switch", "toggle", { entity_id: entities.boost_switch });
+    }
   }
 
   render() {
@@ -496,18 +542,39 @@ class MaicoVMCCard extends LitElement {
             </div>
           </div>
 
-          <!-- Control buttons column -->
+          <!-- Control buttons column with drawer -->
           <div class="controls-section">
-            <div class="controls">
-              <button class="control-btn" @click="${this._handleFanUp}">
-                <ha-icon icon="mdi:chevron-up"></ha-icon>
-              </button>
-              <button class="control-btn" @click="${this._handleMoreInfo}">
-                <ha-icon icon="mdi:menu"></ha-icon>
-              </button>
-              <button class="control-btn" @click="${this._handleFanDown}">
-                <ha-icon icon="mdi:chevron-down"></ha-icon>
-              </button>
+            <div class="controls-wrapper ${this._drawerOpen ? 'drawer-open' : ''}">
+              <!-- Drawer panel -->
+              <div class="drawer">
+                <button class="drawer-btn ${this._getState(entities.power_switch) === 'on' ? 'active' : ''}" 
+                        @click="${this._handlePower}" 
+                        title="${this._localize('power')}">
+                  <ha-icon icon="mdi:power"></ha-icon>
+                </button>
+                <button class="drawer-btn ${this._getState(entities.fan) === 'on' ? 'active' : ''}" 
+                        @click="${this._handleVentilation}"
+                        title="${this._localize('ventilation')}">
+                  <ha-icon icon="mdi:fan"></ha-icon>
+                </button>
+                <button class="drawer-btn ${this._getState(entities.boost_switch) === 'on' ? 'active boost' : ''}" 
+                        @click="${this._handleBoost}"
+                        title="${this._localize('boost')}">
+                  <ha-icon icon="mdi:fan-speed-3"></ha-icon>
+                </button>
+              </div>
+              <!-- Main controls -->
+              <div class="controls">
+                <button class="control-btn" @click="${this._handleFanUp}">
+                  <ha-icon icon="mdi:chevron-up"></ha-icon>
+                </button>
+                <button class="control-btn" @click="${this._toggleDrawer}">
+                  <ha-icon icon="mdi:menu"></ha-icon>
+                </button>
+                <button class="control-btn" @click="${this._handleFanDown}">
+                  <ha-icon icon="mdi:chevron-down"></ha-icon>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -606,11 +673,14 @@ class MaicoVMCCard extends LitElement {
       }
 
       .controls-section {
-        width: auto;
-        padding: 12px 12px 12px 6px;
+        width: 60px; /* Reserve space for closed controls */
+        padding: 12px 6px 12px 0;
         display: flex;
         flex-direction: column;
         flex-shrink: 0;
+        position: relative;
+        z-index: 20;
+        margin-right: 6px;
       }
 
       .side-section {
@@ -757,11 +827,75 @@ class MaicoVMCCard extends LitElement {
         100% { transform: rotate(360deg); }
       }
 
-      .controls {
-        background: var(--ha-card-background, var(--card-background-color, #fff));
-        border: 1px solid var(--divider-color, rgba(0,0,0,0.1));
+      /* Controls wrapper - unified container for drawer + controls */
+      .controls-wrapper {
+        /* Glass effect using color-mix for compatibility */
+        background: color-mix(in srgb, var(--card-background-color, #202020) 80%, transparent);
+        border: 1px solid var(--divider-color, rgba(255, 255, 255, 0.1));
         border-radius: 24px;
-        height: 100%;
+        display: flex;
+        flex-direction: row;
+        /* Height matches container naturally or set 100% of parent relative height */
+        position: absolute;
+        top: 12px;
+        bottom: 12px;
+        right: 6px;
+        width: auto;
+        z-index: 20;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Drawer panel - hidden by default */
+      .drawer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        width: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        opacity: 0;
+      }
+
+      .controls-wrapper.drawer-open .drawer {
+        width: 48px;
+        padding: 8px 6px;
+        opacity: 1;
+      }
+
+      .drawer-btn {
+        background: none;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 50%;
+        color: var(--secondary-text-color);
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .drawer-btn:hover {
+        background: rgba(var(--rgb-primary-text-color), 0.1);
+      }
+
+      .drawer-btn ha-icon {
+        --mdc-icon-size: 24px;
+      }
+
+      .drawer-btn.active {
+        color: var(--success-color, #4caf50);
+      }
+
+      .drawer-btn.active.boost {
+        color: var(--warning-color, #ff9800);
+      }
+
+      .controls {
         display: flex;
         flex-direction: column;
         justify-content: space-around;
@@ -769,9 +903,7 @@ class MaicoVMCCard extends LitElement {
         gap: 4px;
         padding: 8px 6px;
         box-sizing: border-box;
-        position: relative;
-        z-index: 10;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        height: 100%;
       }
 
       .control-btn {
@@ -996,7 +1128,7 @@ window.customCards.push({
 });
 
 console.info(
-  "%c MAICO-VMC-CARD %c 1.1.0",
+  "%c MAICO-VMC-CARD %c 1.2.0",
   "color: white; background: #039be5; font-weight: bold;",
   "color: #039be5; background: white; font-weight: bold;"
 );
