@@ -30,6 +30,61 @@ const EXCHANGER_SVG = `
 </svg>
 `;
 
+// Translations
+const TRANSLATIONS = {
+  en: {
+    efficiency: "Efficiency",
+    temp_outdoor: "Outdoor Air",
+    temp_exhaust: "Exhaust Air",
+    temp_extract: "Extract Air",
+    temp_supply: "Supply Air",
+    open: "Open",
+    closed: "Closed",
+    filter_device: "Device Filter",
+    filter_outdoor: "Outdoor Filter",
+    filter_room: "Room Filter",
+    mode_off: "Off",
+    mode_auto: "Humidity",
+    mode_low: "Reduced",
+    mode_medium: "Normal",
+    mode_high: "Intensive",
+  },
+  fr: {
+    efficiency: "Rendement",
+    temp_outdoor: "Air ext",
+    temp_exhaust: "Air rejeté",
+    temp_extract: "Air extrait",
+    temp_supply: "Air insufflé",
+    open: "Ouvert",
+    closed: "Fermé",
+    filter_device: "Filtre appareil",
+    filter_outdoor: "Filtre extérieur",
+    filter_room: "Filtre pièce",
+    mode_off: "Arrêt",
+    mode_auto: "Humidité",
+    mode_low: "Réduit",
+    mode_medium: "Normal",
+    mode_high: "Intensif",
+  },
+  de: {
+    efficiency: "Wirkungsgrad",
+    temp_outdoor: "Außenluft",
+    temp_exhaust: "Fortluft",
+    temp_extract: "Abluft",
+    temp_supply: "Zuluft",
+    open: "Offen",
+    closed: "Geschlossen",
+    filter_device: "Gerätefilter",
+    filter_outdoor: "Außenfilter",
+    filter_room: "Raumfilter",
+    mode_off: "Aus",
+    mode_auto: "Feuchte",
+    mode_low: "Reduziert",
+    mode_medium: "Normal",
+    mode_high: "Intensiv",
+  }
+};
+
 class MaicoVMCCard extends LitElement {
   static get properties() {
     return {
@@ -38,6 +93,11 @@ class MaicoVMCCard extends LitElement {
       _entities: { type: Object },
       _history: { type: Array },
     };
+  }
+
+  _localize(key) {
+    const lang = this.hass?.language || "en";
+    return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS["en"][key] || key;
   }
 
   constructor() {
@@ -122,19 +182,27 @@ class MaicoVMCCard extends LitElement {
     const height = 80;
     const padding = 5;
 
-    const values = this._history.map((p) => p.value);
+    // Downsample to max 30 points for smoother curve
+    let data = this._history;
+    const maxPoints = 30;
+    if (data.length > maxPoints) {
+      const step = Math.ceil(data.length / maxPoints);
+      data = data.filter((_, i) => i % step === 0 || i === data.length - 1);
+    }
+
+    const values = data.map((p) => p.value);
     const minVal = Math.min(...values) - 5;
     const maxVal = Math.max(...values) + 5;
     const range = maxVal - minVal || 1;
 
     // Calculate points
-    const coords = this._history.map((point, i) => {
-      const x = padding + (i / (this._history.length - 1)) * (width - 2 * padding);
+    const coords = data.map((point, i) => {
+      const x = padding + (i / (data.length - 1)) * (width - 2 * padding);
       const y = height - padding - ((point.value - minVal) / range) * (height - 2 * padding);
       return { x, y };
     });
 
-    // Create smooth cubic bezier curve path
+    // Create smooth cubic bezier curve path (Catmull-Rom spline)
     let path = `M ${coords[0].x},${coords[0].y}`;
 
     for (let i = 0; i < coords.length - 1; i++) {
@@ -143,8 +211,8 @@ class MaicoVMCCard extends LitElement {
       const p2 = coords[i + 1];
       const p3 = coords[i + 2 >= coords.length ? i + 1 : i + 2];
 
-      // Catmull-Rom to Cubic Bezier conversion
-      const tension = 0.8;
+      // Catmull-Rom to Cubic Bezier conversion - lower tension = smoother
+      const tension = 0.25;
       const cp1x = p1.x + (p2.x - p0.x) * tension;
       const cp1y = p1.y + (p2.y - p0.y) * tension;
       const cp2x = p2.x - (p3.x - p1.x) * tension;
@@ -210,15 +278,21 @@ class MaicoVMCCard extends LitElement {
       (e) => e.includes("maico") && (e.includes("bypass") || e.includes("etat_bypass"))
     );
 
-    // Find filter sensors (3 types) - English, French and German patterns
+    // Find filter sensors (3 types) - prefer remaining days
     entities.filter_device = allEntities.find(
-      (e) => e.includes("maico") && (e.includes("filter_device") || e.includes("filtre_appareil") || e.includes("geratefilter"))
+      (e) => e.includes("maico") &&
+        (e.includes("filter_device") || e.includes("filtre_appareil") || e.includes("geratefilter")) &&
+        (e.includes("days") || e.includes("jours") || e.includes("restant") || e.includes("verbleibend"))
     );
     entities.filter_outdoor = allEntities.find(
-      (e) => e.includes("maico") && (e.includes("filter_outdoor") || e.includes("filtre_exterieur") || e.includes("filtre_ext") || e.includes("aussenfilter"))
+      (e) => e.includes("maico") &&
+        (e.includes("filter_outdoor") || e.includes("filtre_exterieur") || e.includes("filtre_ext") || e.includes("aussenfilter")) &&
+        (e.includes("days") || e.includes("jours") || e.includes("restant") || e.includes("verbleibend"))
     );
     entities.filter_room = allEntities.find(
-      (e) => e.includes("maico") && (e.includes("filter_room") || e.includes("filtre_piece") || e.includes("filtre_interieur") || e.includes("raumfilter"))
+      (e) => e.includes("maico") &&
+        (e.includes("filter_room") || e.includes("filtre_piece") || e.includes("filtre_interieur") || e.includes("raumfilter")) &&
+        (e.includes("days") || e.includes("jours") || e.includes("restant") || e.includes("verbleibend"))
     );
 
     return entities;
@@ -237,11 +311,11 @@ class MaicoVMCCard extends LitElement {
 
   _getFanModeLabel(mode) {
     const modes = {
-      off: "Arrêt",
-      auto: "Humidité",
-      low: "Réduit",
-      medium: "Normal",
-      high: "Intensif",
+      off: this._localize("mode_off"),
+      auto: this._localize("mode_auto"),
+      low: this._localize("mode_low"),
+      medium: this._localize("mode_medium"),
+      high: this._localize("mode_high"),
     };
     return modes[mode] || mode || "—";
   }
@@ -357,9 +431,9 @@ class MaicoVMCCard extends LitElement {
               <div class="header-center">
                 ${this.config.show_efficiency
         ? html`
-                      <span class="efficiency">
-                        <ha-icon icon="mdi:swap-horizontal-bold"></ha-icon>
-                        Rendement: ${efficiency} %
+                      <span class="efficiency" title="${this._localize("efficiency")}">
+                        <ha-icon icon="mdi:gauge"></ha-icon>
+                        ${efficiency} %
                       </span>
                     `
         : ""}
@@ -370,11 +444,11 @@ class MaicoVMCCard extends LitElement {
             <div class="card-content">
               <!-- Left temperatures -->
               <div class="temp-info left-top">
-                <span class="temp-label">Air ext</span>
+                <span class="temp-label">${this._localize("temp_outdoor")}</span>
                 <span class="temp-value">${this._getState(entities.temp_inlet)}</span>
               </div>
               <div class="temp-info left-bottom">
-                <span class="temp-label">Air rejeté</span>
+                <span class="temp-label">${this._localize("temp_exhaust")}</span>
                 <span class="temp-value">${this._getState(entities.temp_exhaust)}</span>
               </div>
 
@@ -383,11 +457,11 @@ class MaicoVMCCard extends LitElement {
 
               <!-- Right temperatures -->
               <div class="temp-info right-top">
-                <span class="temp-label">Air extrait</span>
+                <span class="temp-label">${this._localize("temp_extract")}</span>
                 <span class="temp-value">${this._getState(entities.temp_extract)}</span>
               </div>
               <div class="temp-info right-bottom">
-                <span class="temp-label">Air insufflé</span>
+                <span class="temp-label">${this._localize("temp_supply")}</span>
                 <span class="temp-value">${this._getState(entities.temp_supply)}</span>
               </div>
             </div>
@@ -444,7 +518,7 @@ class MaicoVMCCard extends LitElement {
         ? html`
                 <div class="footer-item bypass ${bypassState === "on" ? "open" : "closed"}">
                   <ha-icon icon="mdi:valve"></ha-icon>
-                  <span>${bypassState === "on" ? "Ouvert" : "Fermé"}</span>
+                  <span>${bypassState === "on" ? this._localize("open") : this._localize("closed")}</span>
                 </div>
               `
         : ""}
@@ -452,7 +526,7 @@ class MaicoVMCCard extends LitElement {
         ? html`
                 <div class="footer-item filter ${parseInt(filterDevice) < 30 ? "warning" : ""}">
                   <ha-icon icon="mdi:air-filter"></ha-icon>
-                  <span title="Filtre appareil">${filterDevice}j</span>
+                  <span title="${this._localize("filter_device")}">${filterDevice}j</span>
                 </div>
               `
         : ""}
@@ -460,7 +534,7 @@ class MaicoVMCCard extends LitElement {
         ? html`
                 <div class="footer-item filter ${parseInt(filterOutdoor) < 30 ? "warning" : ""}">
                   <ha-icon icon="mdi:weather-windy"></ha-icon>
-                  <span title="Filtre extérieur">${filterOutdoor}j</span>
+                  <span title="${this._localize("filter_outdoor")}">${filterOutdoor}j</span>
                 </div>
               `
         : ""}
@@ -468,7 +542,7 @@ class MaicoVMCCard extends LitElement {
         ? html`
                 <div class="footer-item filter ${parseInt(filterRoom) < 30 ? "warning" : ""}">
                   <ha-icon icon="mdi:home-outline"></ha-icon>
-                  <span title="Filtre pièce">${filterRoom}j</span>
+                  <span title="${this._localize("filter_room")}">${filterRoom}j</span>
                 </div>
               `
         : ""}
@@ -548,21 +622,32 @@ class MaicoVMCCard extends LitElement {
       }
 
       .card-header {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
+        display: flex;
         align-items: center;
         margin-bottom: 8px;
         cursor: pointer;
         min-height: 24px;
+        gap: 8px;
       }
       
-      .header-left { justify-self: start; }
-      .header-center { justify-self: center; }
-      .header-right { justify-self: end; }
+      .header-left { 
+        flex: 0 1 auto;
+        min-width: 0;
+      }
+      .header-center { 
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        min-width: 0;
+      }
+      .header-right { 
+        flex: 0 0 auto;
+      }
 
       .name {
         font-size: 18px;
         font-weight: bold;
+        white-space: nowrap;
       }
 
       .efficiency {
@@ -571,6 +656,10 @@ class MaicoVMCCard extends LitElement {
         gap: 4px;
         font-size: 14px;
         opacity: 0.8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
       }
 
       .efficiency ha-icon {
@@ -907,7 +996,7 @@ window.customCards.push({
 });
 
 console.info(
-  "%c MAICO-VMC-CARD %c 1.0.0",
+  "%c MAICO-VMC-CARD %c 1.1.0",
   "color: white; background: #039be5; font-weight: bold;",
   "color: #039be5; background: white; font-weight: bold;"
 );
