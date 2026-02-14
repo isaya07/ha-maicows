@@ -191,7 +191,7 @@ class MaicoVMCCard extends LitElement {
 
     const width = 400;
     const height = 80;
-    const padding = 5;
+    const padding = 0;
 
     // Downsample to max 30 points for smoother curve
     let data = this._history;
@@ -718,6 +718,7 @@ class MaicoVMCCard extends LitElement {
         font-size: 18px;
         font-weight: bold;
         white-space: nowrap;
+        color: var(--primary-text-color);
       }
 
       .efficiency {
@@ -725,7 +726,7 @@ class MaicoVMCCard extends LitElement {
         align-items: center;
         gap: 4px;
         font-size: 14px;
-        opacity: 0.8;
+        color: var(--secondary-text-color);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -739,7 +740,7 @@ class MaicoVMCCard extends LitElement {
 
       .card-content {
         display: grid;
-        grid-template-columns: minmax(50px, 1fr) minmax(50px, 70px) minmax(50px, 1fr);
+        grid-template-columns: minmax(50px, 1fr) minmax(50px, 100px) minmax(50px, 1fr);
         grid-template-rows: 1fr 1fr;
         gap: 2px 4px;
         align-items: center;
@@ -758,7 +759,7 @@ class MaicoVMCCard extends LitElement {
 
       .temp-label {
         font-size: 14px;
-        opacity: 0.7;
+        color: var(--secondary-text-color);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -769,6 +770,7 @@ class MaicoVMCCard extends LitElement {
       .temp-value {
         font-size: 14px;
         font-weight: 500;
+        color: var(--primary-text-color);
       }
 
       .left-top { grid-area: 1 / 1; }
@@ -809,6 +811,7 @@ class MaicoVMCCard extends LitElement {
         gap: 2px;
         font-size: 14px;
         text-align: center;
+        color: var(--primary-text-color);
       }
 
       .info-item ha-icon {
@@ -946,7 +949,7 @@ class MaicoVMCCard extends LitElement {
         align-items: center;
         gap: 4px;
         font-size: 13px;
-        opacity: 0.9;
+        color: var(--primary-text-color);
       }
 
       .footer-item ha-icon {
@@ -970,12 +973,12 @@ class MaicoVMCCard extends LitElement {
         }
         
         .exchanger { max-width: 50px; }
-        .temp-label { font-size: 10px; }
-        .temp-value { font-size: 11px; }
+        .temp-label { font-size: 12px; }
+        .temp-value { font-size: 12px; }
         
         .name { font-size: 14px; }
-        .efficiency { font-size: 11px; }
-        .info-item { font-size: 11px; }
+        .efficiency { font-size: 12px; }
+        .info-item { font-size: 12px; }
       }
 
       /* Very compact vertical mode */
@@ -984,7 +987,6 @@ class MaicoVMCCard extends LitElement {
         .controls-section { padding: 4px 8px 4px 6px !important; }
         .card-header { margin-bottom: 2px !important; }
         .card-footer { display: none; }
-        .exchanger { max-width: 60px; }
       }
 
       @media (max-width: 300px) {
