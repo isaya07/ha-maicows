@@ -1,6 +1,6 @@
 {
     "name": "ha-maicows-card",
-    "version": "1.2.0",
+    "version": "1.4.4",
     "description": "Custom Lovelace card for Maico WS VMC integration",
     "main": "dist/ha-maicows-card.js",
     "scripts": {

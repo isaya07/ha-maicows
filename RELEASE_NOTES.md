@@ -1,3 +1,21 @@
+# Release v1.4.4: Card Theme Compliance
+
+## 🎨 Improvements
+
+### Maico VMC Card - HA Theme Colors
+Replaced all hardcoded text colors in the custom Lovelace card with proper Home Assistant CSS theme variables:
+
+- **`.name`**: Now uses `--primary-text-color`
+- **`.efficiency`**: Replaced `opacity: 0.8` with `--secondary-text-color`
+- **`.temp-label`**: Replaced `opacity: 0.7` with `--secondary-text-color`
+- **`.temp-value`**: Now uses `--primary-text-color`
+- **`.info-item`**: Now uses `--primary-text-color`
+- **`.footer-item`**: Replaced `opacity: 0.9` with `--primary-text-color`
+
+The card now fully respects the user's HA theme, including custom and dark themes.
+
+---
+
 # Release v1.4.3: API Method Fixes
 
 ## 🐛 Bug Fixes

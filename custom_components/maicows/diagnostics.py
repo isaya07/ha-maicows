@@ -20,7 +20,7 @@ async def async_get_config_entry_diagnostics(
     coordinator: MaicoCoordinator = hass.data[DOMAIN][entry.entry_id]
 
     # Get current data from coordinator
-    data = coordinator.data if coordinator.data else {}
+    data = coordinator.data or {}
 
     # Build diagnostics data
     return {

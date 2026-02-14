@@ -18,3 +18,5 @@ config/*
 !config/configuration.yaml
 
 ha-maicows-card/dist/
+ha-maicows-card/node_modules/
+ha-maicows-card/package-lock.json

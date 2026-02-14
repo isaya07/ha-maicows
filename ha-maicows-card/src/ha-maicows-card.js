@@ -1130,7 +1130,7 @@ window.customCards.push({
 });
 
 console.info(
-  "%c MAICO-VMC-CARD %c 1.2.0",
+  "%c MAICO-VMC-CARD %c 1.4.4",
   "color: white; background: #039be5; font-weight: bold;",
   "color: #039be5; background: white; font-weight: bold;"
 );
