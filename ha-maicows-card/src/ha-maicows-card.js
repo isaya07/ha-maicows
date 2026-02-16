@@ -758,7 +758,7 @@ class MaicoVMCCard extends LitElement {
       }
 
       .temp-label {
-        font-size: 14px;
+        font-size: 16px;
         color: var(--secondary-text-color);
         white-space: nowrap;
         overflow: hidden;
@@ -768,7 +768,7 @@ class MaicoVMCCard extends LitElement {
       }
 
       .temp-value {
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 500;
         color: var(--primary-text-color);
       }
@@ -948,12 +948,12 @@ class MaicoVMCCard extends LitElement {
         display: flex;
         align-items: center;
         gap: 4px;
-        font-size: 13px;
+        font-size: 14px;
         color: var(--primary-text-color);
       }
 
       .footer-item ha-icon {
-        --mdc-icon-size: 18px;
+        --mdc-icon-size: 24px;
       }
 
       .footer-item.bypass ha-icon { color: var(--vmc-info); }
@@ -972,9 +972,9 @@ class MaicoVMCCard extends LitElement {
           padding: 0 4px 0 8px;
         }
         
-        .exchanger { max-width: 50px; }
-        .temp-label { font-size: 12px; }
-        .temp-value { font-size: 12px; }
+        .exchanger { max-width: 40px; }
+        .temp-label { font-size: 14px; }
+        .temp-value { font-size: 14px; }
         
         .name { font-size: 14px; }
         .efficiency { font-size: 12px; }
