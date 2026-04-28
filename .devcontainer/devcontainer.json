@@ -2,7 +2,7 @@
     "name": "Home Assistant Dev",
     "image": "mcr.microsoft.com/devcontainers/python:3.13",
     "features": {
-        "ghcr.io/devcontainers/features/node:1": {},
+        "ghcr.io/devcontainers/features/node:2": {},
         "ghcr.io/devcontainers/features/common-utils:2": {
             "installZsh": true,
             "configureZshAsDefaultShell": true,
