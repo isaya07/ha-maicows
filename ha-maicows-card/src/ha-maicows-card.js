@@ -366,7 +366,7 @@ class MaicoVMCCard extends LitElement {
     const entities = this._discoverEntities();
     if (!entities.climate) return;
 
-    const fanModes = ["off", "low", "medium", "high"];
+    const fanModes = ["off", "auto", "low", "medium", "high"];
     const currentMode = this._getAttribute(entities.climate, "fan_mode") || "low";
     const currentIndex = fanModes.indexOf(currentMode);
     const newIndex = Math.min(currentIndex + 1, fanModes.length - 1);
@@ -381,7 +381,7 @@ class MaicoVMCCard extends LitElement {
     const entities = this._discoverEntities();
     if (!entities.climate) return;
 
-    const fanModes = ["off", "low", "medium", "high"];
+    const fanModes = ["off", "auto", "low", "medium", "high"];
     const currentMode = this._getAttribute(entities.climate, "fan_mode") || "low";
     const currentIndex = fanModes.indexOf(currentMode);
     const newIndex = Math.max(currentIndex - 1, 0);
@@ -440,6 +440,7 @@ class MaicoVMCCard extends LitElement {
     const humidity = this._getState(entities.humidity);
     const fanMode = climate?.attributes?.fan_mode || "—";
     const bypassState = this._getState(entities.bypass);
+    const isBypassOpen = bypassState === "on" || bypassState === "open";
 
     // Get all 3 filter types
     const filterDevice = this._getState(entities.filter_device);
@@ -583,9 +584,9 @@ class MaicoVMCCard extends LitElement {
         <div class="card-footer">
           ${bypassState !== "—"
         ? html`
-                <div class="footer-item bypass ${bypassState === "on" ? "open" : "closed"}">
+                <div class="footer-item bypass ${isBypassOpen ? "open" : "closed"}">
                   <ha-icon icon="mdi:valve"></ha-icon>
-                  <span>${bypassState === "on" ? this._localize("open") : this._localize("closed")}</span>
+                  <span>${isBypassOpen ? this._localize("open") : this._localize("closed")}</span>
                 </div>
               `
         : ""}
@@ -1130,7 +1131,7 @@ window.customCards.push({
 });
 
 console.info(
-  "%c MAICO-VMC-CARD %c 1.4.4",
+  "%c MAICO-VMC-CARD %c 1.4.5",
   "color: white; background: #039be5; font-weight: bold;",
   "color: #039be5; background: white; font-weight: bold;"
 );
